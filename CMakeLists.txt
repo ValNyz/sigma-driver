@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # ---- Library: core + vendor ----
-add_library(sigma_ptp
+add_library(libptp_sigma
     apex.cpp
     log.cpp
     schema.cpp
