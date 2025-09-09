@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: apt install libusb-1.0-0-dev
+      - run: sudo apt-get -y install libusb-1.0-0-dev
       - run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       - run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
