@@ -1,0 +1,30 @@
+#pragma once
+#include <cstdint>
+#include <cstddef>
+#include <cstdarg>
+
+enum class LogLevel : uint8_t { Error=0, Warning=1, Info=2, Debug=3 };
+
+// External sink signature. Receives a ready-to-print UTF-8 line (no newline).
+using LogSink = void(*)(LogLevel level, const char* message);
+
+// Configuration
+void        log_set_level(LogLevel lvl);
+LogLevel    log_get_level();
+void        log_set_sink(LogSink sink);
+
+// Emission
+void        log_printf(LogLevel lvl, const char* fmt, ...);
+void        log_vprintf(LogLevel lvl, const char* fmt, va_list ap);
+
+// Convenience macros with file:line tag
+void        log_printf_tag(LogLevel lvl, const char* file, int line, const char* fmt, ...);
+
+#define LOG_SET_LEVEL(lvl)     log_set_level(lvl)
+#define LOG_ERROR(...)        log_printf_tag(LogLevel::Error,   __FILE__, __LINE__, __VA_ARGS__)
+#define LOG_WARN(...)         log_printf_tag(LogLevel::Warning, __FILE__, __LINE__, __VA_ARGS__)
+#define LOG_INFO(...)         log_printf_tag(LogLevel::Info,    __FILE__, __LINE__, __VA_ARGS__)
+#define LOG_DEBUG(...)        log_printf_tag(LogLevel::Debug,   __FILE__, __LINE__, __VA_ARGS__)
+
+// Hex preview helper (prints up to max_bytes as hex)
+void log_hex_preview(LogLevel lvl, const void* data, size_t len, size_t max_bytes = 64);
