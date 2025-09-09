@@ -4,9 +4,9 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "enum.h"
 #include "ptp/utils.h"
-#include "schema.h"
+#include "sigma/enum.h"
+#include "sigma/schema.h"
 
 // ---------------- CamDataGroup1 ----------------
 std::vector<std::uint8_t> CamDataGroup1::encode() const {

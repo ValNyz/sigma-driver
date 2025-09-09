@@ -11,16 +11,16 @@ endif()
 
 # ---- Library: core + vendor ----
 add_library(libptp_sigma
-    apex.cpp
-    log.cpp
-    schema.cpp
-    sigma_ptp.cpp
-    ptp/usb_transport.cpp
-    ptp/ptp.cpp
+    src/apex.cpp
+    src/log.cpp
+    src/schema.cpp
+    src/sigma_ptp.cpp
+    src/ptp/usb_transport.cpp
+    src/ptp/ptp.cpp
 )
 
 target_include_directories(libptp_sigma PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # target_compile_options(sigma_ptp PRIVATE
@@ -44,12 +44,8 @@ else()
 endif()
 
 # ---- Example app (edit or add more) ----
-add_executable(sigma_camera_test
-    sigma_camera_test.cpp
+add_executable(sigma_capture_example
+    examples/sigma_capture_example.cpp
 )
 
-# target_include_directories(sigma_camera_test PUBLIC
-#     ${CMAKE_CURRENT_SOURCE_DIR}
-# )
-
-target_link_libraries(sigma_camera_test PRIVATE libptp_sigma)
+target_link_libraries(sigma_capture_example PRIVATE libptp_sigma)
