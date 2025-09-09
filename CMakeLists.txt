@@ -49,3 +49,6 @@ add_executable(sigma_capture_example
 )
 
 target_link_libraries(sigma_capture_example PRIVATE libptp_sigma)
+
+enable_testing()
+add_subdirectory(tests)
