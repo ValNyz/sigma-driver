@@ -13,7 +13,7 @@ from computers such as
 - taking pictures,
 - live view,
 
-and so on. This C library provides a part of the opration on the fp series.
+and so on. This C library provides a part of the operation.
 
 ## Getting started
 
@@ -39,8 +39,8 @@ SIGMA Corp distributes the [SIGMA Camera Control SDK](https://www.sigma-global.c
 
 [libgphoto2](http://www.gphoto.org/) is a open-source framework designed to allow access to digital cameras by external programs. It provides operations on a lot of cameras such as Canon, Nikon, and Sony, but SIGMA fp is less supported at the current version v2.5.27.
 
-[sigma-ptpy](https://github.com/makanikai/sigma-ptpy) is a python camera control library for the Sigma FP. It extends the (ptpy)[https://github.com/Parrot-Developers/sequoia-ptpy] which allow to control other cameras.
+[sigma-ptpy](https://github.com/makanikai/sigma-ptpy) is a python camera control library for the Sigma FP. It extends the [ptpy](https://github.com/Parrot-Developers/sequoia-ptpy) python library which allow to control other cameras.
 
 ## Contribution
 
-Fork and create a PR, please.
+Uo're welcome to fork and create a PR.
