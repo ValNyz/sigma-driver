@@ -53,6 +53,15 @@ static inline std::uint16_t read_16le(const std::uint8_t *p)
     return std::uint16_t(p[0] | (p[1] << 8));
 }
 
+// Put 32 bits, 8 bytes (little endian)
+static inline void put_32le(std::vector<std::uint8_t> &b, std::uint32_t v)
+{
+    b.push_back(v);
+    b.push_back(v >> 8);
+    b.push_back(v >> 16);
+    b.push_back(v >> 24);
+}
+
 // Read 32 bits, 4 bytes (little endian)
 static inline std::uint32_t read_32le(const std::uint8_t *p)
 {
@@ -60,11 +69,12 @@ static inline std::uint32_t read_32le(const std::uint8_t *p)
 }
 
 // Appends a 32-bit integer to a byte vector in little-endian order.
-static inline void append_u32le(std::vector<uint8_t>& b, uint32_t v){
-	b.push_back(uint8_t(v));
-	b.push_back(uint8_t(v>>8));
-	b.push_back(uint8_t(v>>16));
-	b.push_back(uint8_t(v>>24));
+static inline void append_u32le(std::vector<uint8_t> &b, uint32_t v)
+{
+    b.push_back(uint8_t(v));
+    b.push_back(uint8_t(v >> 8));
+    b.push_back(uint8_t(v >> 16));
+    b.push_back(uint8_t(v >> 24));
 }
 
 // Decode 16-bit 12.4 fixed-point
