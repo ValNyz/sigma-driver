@@ -7,7 +7,7 @@
 #include "utils.h"
 
 // ISO 15740 core opcodes (subset that’s broadly useful)
-enum : std::uint16_t {
+enum : uint16_t {
 	PTP_OP_GetDeviceInfo        = 0x1001,
 	PTP_OP_OpenSession          = 0x1002,
 	PTP_OP_CloseSession         = 0x1003,
@@ -43,18 +43,60 @@ enum : uint16_t {
 };
 
 enum : uint16_t {
-	PTP_OP_GET_DEVICE_INFO    = 0x1001,
-	PTP_OP_OPEN_SESSION       = 0x1002,
-	PTP_OP_CLOSE_SESSION      = 0x1003,
-	PTP_OP_GET_OBJECT_HANDLES = 0x1007,
-	PTP_OP_GET_OBJECT         = 0x1009,
-	PTP_OP_INITIATE_CAPTURE   = 0x100E,
-	PTP_OP_GET_DEVICE_PROP_VAL= 0x1015,
-	PTP_OP_SET_DEVICE_PROP_VAL= 0x1016,
+    PTP_RESP_Undefined=0x2000,
+    PTP_RESP_OK=0x2001,
+    PTP_RESP_GeneralError=0x2002,
+    PTP_RESP_SessionNotOpen=0x2003,
+    PTP_RESP_InvalidTransactionID=0x2004,
+    PTP_RESP_OperationNotSupported=0x2005,
+    PTP_RESP_ParameterNotSupported=0x2006,
+    PTP_RESP_IncompleteTransfer=0x2007,
+    PTP_RESP_InvalidStorageId=0x2008,
+    PTP_RESP_InvalidObjectHandle=0x2009,
+    PTP_RESP_DevicePropNotSupported=0x200A,
+    PTP_RESP_InvalidObjectFormatCode=0x200B,
+    PTP_RESP_StoreFull=0x200C,
+    PTP_RESP_ObjectWriteProtected=0x200D,
+    PTP_RESP_StoreReadOnly=0x200E,
+    PTP_RESP_AccessDenied=0x200F,
+    PTP_RESP_NoThumbnailPresent=0x2010,
+    PTP_RESP_SelfTestFailed=0x2011,
+    PTP_RESP_PartialDeletion=0x2012,
+    PTP_RESP_StoreNotAvailable=0x2013,
+    PTP_RESP_SpecificationByFormatUnsupported=0x2014,
+    PTP_RESP_NoValidObjectInfo=0x2015,
+    PTP_RESP_InvalidCodeFormat=0x2016,
+    PTP_RESP_UnknownVendorCode=0x2017,
+    PTP_RESP_CaptureAlreadyTerminated=0x2018,
+    PTP_RESP_DeviceBusy=0x2019,
+    PTP_RESP_InvalidParentObject=0x201A,
+    PTP_RESP_InvalidDevicePropFormat=0x201B,
+    PTP_RESP_InvalidDevicePropValue=0x201C,
+    PTP_RESP_InvalidParameter=0x201D,
+    PTP_RESP_SessionAlreadyOpened=0x201E,
+    PTP_RESP_TransactionCanceled=0x201F,
+    PTP_RESP_SpecificationOfDestinationUnsupported=0x2020,
+    PTP_RESP_InvalidEnumHandle=0x2021,
+    PTP_RESP_NoStreamEnabled=0x2022,
+    PTP_RESP_InvalidDataset=0x2023,
 };
 
-enum : std::uint16_t {
-    PTP_EVENT_ObjectAdded = 0x4002
+enum : uint16_t {
+    PTP_EVENT_Undefined=0x4000,
+    PTP_EVENT_CancelTransaction=0x4001,
+    PTP_EVENT_ObjectAdded=0x4002,
+    PTP_EVENT_ObjectRemoved=0x4003,
+    PTP_EVENT_StoreAdded=0x4004,
+    PTP_EVENT_StoreRemoved=0x4005,
+    PTP_EVENT_DevicePropChanged=0x4006,
+    PTP_EVENT_ObjectInfoChanged=0x4007,
+    PTP_EVENT_DeviceInfoChanged=0x4008,
+    PTP_EVENT_RequestObjectTransfer=0x4009,
+    PTP_EVENT_StoreFull=0x400A,
+    PTP_EVENT_DeviceReset=0x400B,
+    PTP_EVENT_StorageInfoChanged=0x400C,
+    PTP_EVENT_CaptureComplete=0x400D,
+    PTP_EVENT_UnreportedStatus=0x400E,
 };
 
 #pragma pack(push,1)
