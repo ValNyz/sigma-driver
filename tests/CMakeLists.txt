@@ -1,42 +1,74 @@
 cmake_minimum_required(VERSION 3.16)
-project(sigma_tests CXX)
+project(sigma_ptp_tests LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(CTest)
+
 include(FetchContent)
 FetchContent_Declare(
-  catch2
+  Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG v3.5.4
+  GIT_TAG v3.5.2
 )
-FetchContent_MakeAvailable(catch2)
+FetchContent_MakeAvailable(Catch2)
 
-# ---- ptp/utils.h tests (header-only) ----
-add_executable(unit_ptp_utils
-  unit/ptp_utils_tests.cpp
+add_executable(cam_tests
+  integration/cam_tests.cpp
 )
-target_include_directories(unit_ptp_utils PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(unit_ptp_utils PRIVATE Catch2::Catch2WithMain)
 
-# ---- schema.cpp tests ----
-add_executable(unit_schema
+target_include_directories(cam_tests PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_SOURCE_DIR}/tests
+)
+
+target_compile_definitions(cam_tests PRIVATE
+  TEST_SRCDIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+target_link_libraries(cam_tests PRIVATE
+  ptp_sigma
+  Catch2::Catch2WithMain
+)
+
+add_executable(apex_tests
+  unit/apex_tests.cpp
+)
+
+target_include_directories(apex_tests PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+
+target_compile_definitions(apex_tests PRIVATE
+  TEST_SRCDIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+target_link_libraries(apex_tests PRIVATE
+  ptp_sigma
+  Catch2::Catch2WithMain
+)
+
+add_executable(schema_tests
   unit/schema_tests.cpp
-  ${CMAKE_SOURCE_DIR}/src/schema.cpp
-  ${CMAKE_SOURCE_DIR}/src/apex.cpp
 )
-target_include_directories(unit_schema PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(unit_schema PRIVATE Catch2::Catch2WithMain)
 
-# Coverage flags (optional)
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  foreach(tgt IN ITEMS unit_ptp_utils unit_schema)
-    target_compile_options(${tgt} PRIVATE -O0 -g --coverage)
-    target_link_options(${tgt} PRIVATE --coverage)
-  endforeach()
-endif()
+target_include_directories(schema_tests PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
 
-include(CTest)
-add_test(NAME unit_ptp_utils COMMAND unit_ptp_utils)
-add_test(NAME unit_schema     COMMAND unit_schema)
+target_compile_definitions(schema_tests PRIVATE
+  TEST_SRCDIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
 
+target_link_libraries(schema_tests PRIVATE
+  ptp_sigma
+  Catch2::Catch2WithMain
+)
+
+add_test(NAME cam COMMAND cam_tests)
+add_test(NAME apex COMMAND apex_tests)
+add_test(NAME schema COMMAND schema_tests)
