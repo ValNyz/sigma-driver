@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # ---- Library: core + vendor ----
-add_library(libptp_sigma
+add_library(ptp_sigma
     src/apex.cpp
     src/log.cpp
     src/schema.cpp
@@ -19,7 +19,7 @@ add_library(libptp_sigma
     src/ptp/ptp.cpp
 )
 
-target_include_directories(libptp_sigma PUBLIC
+target_include_directories(ptp_sigma PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
@@ -34,13 +34,13 @@ if(PkgConfig_FOUND)
     pkg_check_modules(LIBUSB1 QUIET libusb1-1.0)
 endif()
 if(LIBUSB_FOUND)
-    target_link_libraries(libptp_sigma PUBLIC PkgConfig::LIBUSB)
+    target_link_libraries(ptp_sigma PUBLIC PkgConfig::LIBUSB)
 else()
     find_library(LIBUSB1_LIBRARY NAMES usb-1.0 libusb1-1.0)
     if(NOT LIBUSB1_LIBRARY)
         message(FATAL_ERROR "libusb1-1.0 not found. Install it (e.g. apt install libusb-1.0-0-dev).")
     endif()
-    target_link_libraries(libptp_sigma PUBLIC ${LIBUSB1_LIBRARY})
+    target_link_libraries(ptp_sigma PUBLIC ${LIBUSB1_LIBRARY})
 endif()
 
 # ---- Example app (edit or add more) ----
@@ -48,4 +48,7 @@ add_executable(sigma_capture_example
     examples/sigma_capture_example.cpp
 )
 
-target_link_libraries(sigma_capture_example PRIVATE libptp_sigma)
+target_link_libraries(sigma_capture_example PRIVATE ptp_sigma)
+
+enable_testing()
+add_subdirectory(tests)

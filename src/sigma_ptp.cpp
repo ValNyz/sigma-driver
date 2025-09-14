@@ -1,4 +1,5 @@
 #include <chrono>
+#include <iostream>
 #include <stdexcept>
 #include <thread>
 
@@ -75,6 +76,7 @@ Returns:
 CamCaptStatus SigmaCamera::wait_completion(std::uint8_t image_id, int polls,
                                            int sleep_ms) {
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
   CamCaptStatus st;
   for (int i = 0; i < polls; ++i) {
     st = get_cam_capt_status(image_id);
@@ -165,9 +167,8 @@ PictFileInfo2 SigmaCamera::get_pict_file_info2(std::uint32_t object_handle) {
 }
 
 // --- BigPartialPictFile ---
-BigPartialPictFile
-SigmaCamera::get_big_partial_pict_file(std::uint32_t address,
-                                       std::uint32_t max_bytes)
+BigPartialPictFile SigmaCamera::get_big_partial_pict_file(
+    std::uint32_t address, std::uint32_t start, std::uint32_t max_bytes)
 /*This function downloads image data (image file) shot by the camera in pieces.
 
 Args:
@@ -179,7 +180,7 @@ Returns:
     BigPartialPictFile: BigPartialPictFile object.*/
 {
   auto r = transact(static_cast<std::uint16_t>(SigmaOp::GetBigPartialPictFile),
-                    {address, 0, max_bytes}, nullptr, true);
+                    {address, start, max_bytes}, nullptr, true);
   BigPartialPictFile part;
   part.decode(r.data);
   return part;
@@ -222,15 +223,15 @@ SigmaCamera::get_object_vendor(std::uint32_t object_handle,
 
   std::uint32_t addr = info.FileAddress;
   std::uint32_t left = info.FileSize;
-
+  std::uint32_t start = 0;
   while (left) {
     const std::uint32_t req = std::min(chunk, left);
-    BigPartialPictFile part = get_big_partial_pict_file(addr, req);
+    BigPartialPictFile part = get_big_partial_pict_file(addr, start, req);
     if (part.AcquiredSize == 0 || part.PartialData.empty())
       break;
 
     out.insert(out.end(), part.PartialData.begin(), part.PartialData.end());
-    addr += part.AcquiredSize;
+    start += part.AcquiredSize;
     left -= part.AcquiredSize;
     if (part.PartialData.size() < req)
       break; // safety
@@ -275,7 +276,11 @@ void SigmaCamera::set_group(const GroupT &g)
 Returns:
     CamDataGroup: CamDataGroup object.*/
 {
-  auto bytes = g.encode();
+  std::vector<uint8_t> bytes = g.encode();
+  LOG_DEBUG("Bytes encoding for class %s:", typeid(GroupT).name());
+  log_hex_preview(LogLevel::Debug, &bytes, bytes.size());
+  // for (uint8_t i : bytes)
+  // LOG_DEBUG("Byte: %04X", i);
   (void)transact(static_cast<std::uint16_t>(SigmaGroupMap<GroupT>::Set), {},
                  &bytes, false);
 }
