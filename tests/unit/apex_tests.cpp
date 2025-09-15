@@ -3,7 +3,7 @@
 
 static_assert(CATCH_VERSION_MAJOR >= 3, "Catch2 v3 required");
 
-#include <sigma/apex.h>
+#include <utils/apex.h>
 #include <limits>
 #include <vector>
 #include <utility>

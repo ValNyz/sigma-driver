@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "ptp/utils.h"
+#include "utils/utils.h"
 #include "sigma/enum.h"
 #include "sigma/schema.h"
 
