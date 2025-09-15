@@ -3,8 +3,8 @@
 #include <vector>
 #include <cstdint>
 
-#include "transport.h"
-#include "utils.h"
+#include "ptp/transport.h"
+#include "utils/utils.h"
 
 // ISO 15740 core opcodes (subset that’s broadly useful)
 enum : uint16_t {

@@ -11,10 +11,10 @@ endif()
 
 # ---- Library: core + vendor ----
 add_library(ptp_sigma
-    src/apex.cpp
-    src/log.cpp
-    src/schema.cpp
-    src/sigma_ptp.cpp
+    src/utils/apex.cpp
+    src/utils/log.cpp
+    src/sigma/schema.cpp
+    src/sigma/sigma_ptp.cpp
     src/ptp/usb_transport.cpp
     src/ptp/ptp.cpp
 )

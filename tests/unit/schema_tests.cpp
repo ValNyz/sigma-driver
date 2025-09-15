@@ -7,7 +7,7 @@ static_assert(CATCH_VERSION_MAJOR >= 3, "Catch2 v3 required");
 #include <cstdint>
 #include <vector>
 #include <sigma/schema.h>
-#include <ptp/utils.h>
+#include <utils/utils.h>
 
 static void rt_eq_u8(const std::optional<std::uint8_t> &a,
                      const std::optional<std::uint8_t> &b)

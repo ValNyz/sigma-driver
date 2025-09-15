@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <thread>
 
-#include "sigma/log.h"
+#include "utils/log.h"
 
 #include "sigma/sigma_ptp.h"
 
