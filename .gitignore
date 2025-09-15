@@ -1,2 +1,5 @@
 .vscode/
 build/
+*.DNG
+*.JPEG
+.clang_format

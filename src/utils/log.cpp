@@ -14,8 +14,10 @@ static std::mutex g_mu;
 static LogSink g_sink = nullptr;
 
 // Default sink: prints timestamp, level, and message to stderr.
-static const char *lvl_name(LogLevel l) {
-  switch (l) {
+static const char *lvl_name(LogLevel l)
+{
+  switch (l)
+  {
   case LogLevel::Error:
     return "ERROR";
   case LogLevel::Warning:
@@ -27,7 +29,8 @@ static const char *lvl_name(LogLevel l) {
   }
 }
 
-static void default_sink(LogLevel lvl, const char *msg) {
+static void default_sink(LogLevel lvl, const char *msg)
+{
   using namespace std::chrono;
   auto now = system_clock::now();
   std::time_t t = system_clock::to_time_t(now);
@@ -44,25 +47,29 @@ static void default_sink(LogLevel lvl, const char *msg) {
   std::fflush(stderr);
 }
 
-void log_set_level(LogLevel lvl) {
+void log_set_level(LogLevel lvl)
+{
   g_level.store(lvl, std::memory_order_relaxed);
 }
 
 LogLevel log_get_level() { return g_level.load(std::memory_order_relaxed); }
 
-void log_set_sink(LogSink sink) {
+void log_set_sink(LogSink sink)
+{
   std::lock_guard<std::mutex> lk(g_mu);
   g_sink = sink;
 }
 
-static void emit(LogLevel lvl, const char *line) {
+static void emit(LogLevel lvl, const char *line)
+{
   if ((int)lvl > (int)log_get_level())
     return;
   std::lock_guard<std::mutex> lk(g_mu);
   (g_sink ? g_sink : default_sink)(lvl, line);
 }
 
-void log_vprintf(LogLevel lvl, const char *fmt, va_list ap) {
+void log_vprintf(LogLevel lvl, const char *fmt, va_list ap)
+{
   if ((int)lvl > (int)log_get_level())
     return;
   // format into dynamic buffer
@@ -77,7 +84,8 @@ void log_vprintf(LogLevel lvl, const char *fmt, va_list ap) {
   emit(lvl, buf.data());
 }
 
-void log_printf(LogLevel lvl, const char *fmt, ...) {
+void log_printf(LogLevel lvl, const char *fmt, ...)
+{
   va_list ap;
   va_start(ap, fmt);
   log_vprintf(lvl, fmt, ap);
@@ -85,7 +93,8 @@ void log_printf(LogLevel lvl, const char *fmt, ...) {
 }
 
 void log_printf_tag(LogLevel lvl, const char *file, int line, const char *fmt,
-                    ...) {
+                    ...)
+{
   if ((int)lvl > (int)log_get_level())
     return;
   // format user message first
@@ -107,7 +116,8 @@ void log_printf_tag(LogLevel lvl, const char *file, int line, const char *fmt,
 }
 
 void log_hex_preview(LogLevel lvl, const void *data, size_t len,
-                     size_t max_bytes) {
+                     size_t max_bytes)
+{
   if ((int)lvl > (int)log_get_level())
     return;
   const size_t n = len < max_bytes ? len : max_bytes;
@@ -115,7 +125,8 @@ void log_hex_preview(LogLevel lvl, const void *data, size_t len,
   std::string s;
   s.reserve(n * 3 + 16);
   char byte[4];
-  for (size_t i = 0; i < n; ++i) {
+  for (size_t i = 0; i < n; ++i)
+  {
     std::snprintf(byte, sizeof(byte), "%02X", p[i]);
     s += byte;
     if (i + 1 < n)

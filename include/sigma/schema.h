@@ -218,7 +218,7 @@ class CamCaptStatus
         std::uint8_t ImageId{0};
         std::uint8_t ImageDBHead{0};
         std::uint8_t ImageDBTail{0};
-        CaptStatus Status{CaptStatus::Cleared}; // Int16 LE
+        CaptStatus Status{CaptStatus::Null}; // Int16 LE
         DestToSave Dest{DestToSave::Null};   // Int8/
 
         void decode(const std::vector<std::uint8_t> &raw);

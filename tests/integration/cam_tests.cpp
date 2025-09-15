@@ -18,7 +18,7 @@ TEST_CASE("SetCamDataGroup1 cmd/data out frame")
 
   CamDataGroup1 g{};
   g.isoAuto = ISOAuto::Manual;
-  g.shutterSpeed = ShutterSpeed3Converter.encode_uint8(30);
+  g.shutterSpeed = ShutterSpeed3Converter.encode_uint8(2);
   g.isoSpeed = ISOSpeedConverter.encode_uint8(1600);
   auto payload = g.encode();
 
@@ -57,7 +57,7 @@ TEST_CASE("SetCamDataGroup1 cmd/data out frame")
 
   // golden byte-for-byte comparisons
   const auto golden_cmd  = hex2bin("0C 00 00 00 01 00 16 90 00 00 00 00");                      // True frame obtained using wireshark
-  const auto golden_data = hex2bin("13 00 00 00 02 00 16 90 00 00 00 00 00 19 00 10 00 40 00"); // True frame obtained using wireshark
+  const auto golden_data = hex2bin("13 00 00 00 02 00 16 90 00 00 00 00 00 19 00 30 00 40 00"); // True frame obtained using wireshark
 
   REQUIRE(cmd_m == golden_cmd);
   REQUIRE(data_m == golden_data);

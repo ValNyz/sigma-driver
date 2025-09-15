@@ -95,8 +95,8 @@ public:
   CamCaptStatus wait_completion(std::uint8_t image_id, int polls = 30,
                                 int sleep_ms = 1000);
 
-  void snap(const SnapCommand &cmd);
-  void snap(CaptureMode mode, std::uint8_t amount); // convenience
+  uint16_t snap(const SnapCommand &cmd);
+  uint16_t snap(CaptureMode mode, std::uint8_t amount); // convenience
 
   void clear_image_db_single(std::uint32_t image_id);
 
