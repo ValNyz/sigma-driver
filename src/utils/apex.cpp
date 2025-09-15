@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "sigma/apex.h"
+#include "utils/apex.h"
 
 ApexConverter::ApexConverter(std::vector<std::pair<std::uint8_t, double>> table)
     : dectable_(std::move(table)), enctable_(dectable_) {

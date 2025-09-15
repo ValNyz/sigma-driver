@@ -4,9 +4,9 @@
 #include <thread>
 
 #include "ptp/usb_transport.h"
-#include "sigma/apex.h"
+#include "utils/apex.h"
+#include "utils/log.h"
 #include "sigma/enum.h"
-#include "sigma/log.h"
 #include "sigma/sigma_ptp.h"
 
 static void save(const std::string &path, const std::vector<uint8_t> &data) {

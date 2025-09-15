@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "sigma/log.h"
+#include "utils/log.h"
 
 static std::atomic<LogLevel> g_level{LogLevel::Info};
 static std::mutex g_mu;

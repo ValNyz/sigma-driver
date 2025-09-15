@@ -3,14 +3,13 @@
 
 static_assert(CATCH_VERSION_MAJOR >= 3, "Catch2 v3 required");
 
-#include "sigma/log.h"
+#include "utils/log.h"
+#include "utils/utils.h"
+#include "utils/apex.h"
 #include "ptp/ptp.h"
-#include "ptp/utils.h"
-#include "sigma/apex.h"
 #include "sigma/schema.h"
 #include "sigma/sigma_ptp.h"
-#include "tests/fake_transport.h"
-#include "tests/utils.h"
+#include "ptp/fake_transport.h"
 
 TEST_CASE("SetCamDataGroup1 cmd/data out frame")
 {
