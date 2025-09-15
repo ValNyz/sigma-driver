@@ -232,6 +232,7 @@ enum class CaptureMode : std::uint8_t
 
 enum class CaptStatus : std::uint16_t
 {
+  Null = 0xFFFF,
   Cleared = 0x0000,
   ShootInProgress = 0x0001,
   ShootSuccess = 0x0002,

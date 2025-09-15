@@ -76,8 +76,9 @@ Returns:
 CamCaptStatus SigmaCamera::wait_completion(std::uint8_t image_id, int polls,
                                            int sleep_ms) {
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   CamCaptStatus st;
+  int err = 0;
   for (int i = 0; i < polls; ++i) {
     st = get_cam_capt_status(image_id);
     const std::uint16_t code = static_cast<std::uint16_t>(st.Status);
@@ -87,7 +88,7 @@ CamCaptStatus SigmaCamera::wait_completion(std::uint8_t image_id, int polls,
     switch (static_cast<CaptStatus>(code)) {
     case CaptStatus::ImageGenCompleted:
     case CaptStatus::ImageDataStorageCompleted:
-    case CaptStatus::Cleared:
+    // case CaptStatus::Cleared:
       return st;
 
     case CaptStatus::ShootInProgress:
@@ -96,11 +97,12 @@ CamCaptStatus SigmaCamera::wait_completion(std::uint8_t image_id, int polls,
     case CaptStatus::AFSuccess:
     case CaptStatus::CWBSuccess:
       LOG_INFO("Current status 0x%04X, waiting...", code);
-
+      break;
     default:
-      // transient or unexpected; tolerate a few, then return
+      err++;
       LOG_WARN("Unexpected capture status 0x%04X", code);
-      return st;
+      if (err > 15)
+        return st;
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
@@ -109,18 +111,24 @@ CamCaptStatus SigmaCamera::wait_completion(std::uint8_t image_id, int polls,
 }
 
 // --- SnapCommand ---
-void SigmaCamera::snap(const SnapCommand &cmd)
+uint16_t SigmaCamera::snap(const SnapCommand &cmd)
 /*This command issues shooting instructions from the PC to the camera.
 
 Args:
     data (SnapCommand): a snap command object.*/
 {
   auto payload = cmd.encode();
-  (void)transact(static_cast<std::uint16_t>(SigmaOp::SnapCommand), {}, &payload,
+  auto r = transact(static_cast<std::uint16_t>(SigmaOp::SnapCommand), {}, &payload,
                  false);
+  LOG_DEBUG("Snap Response: 0x%04X", r.response_code);
+  if (r.params.size() > 0)
+    log_hex_preview(LogLevel::Debug, r.params.data(), r.params.size());
+  if (r.data.size() > 0)
+    log_hex_preview(LogLevel::Debug, r.data.data(), r.data.size());
+  return r.response_code;
 }
 
-void SigmaCamera::snap(CaptureMode mode, std::uint8_t amount)
+uint16_t SigmaCamera::snap(CaptureMode mode, std::uint8_t amount)
 /*This command issues shooting instructions from the PC to the camera.
 
 Args:
@@ -130,7 +138,7 @@ Args:
   SnapCommand cmd;
   cmd.Mode = mode;
   cmd.Amount = amount;
-  snap(cmd);
+  return snap(cmd);
 }
 
 void SigmaCamera::clear_image_db_single(std::uint32_t image_id)
@@ -139,7 +147,7 @@ void SigmaCamera::clear_image_db_single(std::uint32_t image_id)
 {
   std::vector<std::uint8_t> payload(10, 0x00); // undocumented 10 zero bytes
   (void)transact(static_cast<std::uint16_t>(SigmaOp::ClearImageDBSingle),
-                 {image_id}, &payload, false);
+                 {}, &payload, false);
   LOG_INFO("ClearImageDBSingle image_id=%u", image_id);
 }
 
@@ -264,6 +272,11 @@ Returns:
 {
   auto r = transact(static_cast<std::uint16_t>(SigmaGroupMap<GroupT>::Get), {},
                     nullptr, true);
+  LOG_DEBUG("Bytes responce for class %s:", typeid(GroupT).name());
+  if (r.params.size() > 0)
+    log_hex_preview(LogLevel::Debug, r.params.data(), r.params.size());
+  if (r.data.size() > 0)
+    log_hex_preview(LogLevel::Debug, r.data.data(), r.data.size());
   GroupT g;
   g.decode(r.data);
   return g;
@@ -271,16 +284,15 @@ Returns:
 
 template <class GroupT>
 void SigmaCamera::set_group(const GroupT &g)
-/*This instruction acquires DataGroup status information from the camera.
+/*This instruction changes DataGroup5 status information of the camera.
 
-Returns:
-    CamDataGroup: CamDataGroup object.*/
+Args:
+    data (CamDataGroup): CamDataGroup status information*/
 {
   std::vector<uint8_t> bytes = g.encode();
   LOG_DEBUG("Bytes encoding for class %s:", typeid(GroupT).name());
-  log_hex_preview(LogLevel::Debug, &bytes, bytes.size());
-  // for (uint8_t i : bytes)
-  // LOG_DEBUG("Byte: %04X", i);
+  log_hex_preview(LogLevel::Debug, bytes.data(), bytes.size());
+
   (void)transact(static_cast<std::uint16_t>(SigmaGroupMap<GroupT>::Set), {},
                  &bytes, false);
 }
