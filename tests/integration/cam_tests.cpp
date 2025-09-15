@@ -19,7 +19,7 @@ TEST_CASE("SetCamDataGroup1 cmd/data out frame")
 
   CamDataGroup1 g{};
   g.isoAuto = ISOAuto::Manual;
-  g.shutterSpeed = ShutterSpeed3Converter.encode_uint8(30);
+  g.shutterSpeed = ShutterSpeed3Converter.encode_uint8(2);
   g.isoSpeed = ISOSpeedConverter.encode_uint8(1600);
   auto payload = g.encode();
 
