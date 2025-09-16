@@ -46,6 +46,7 @@ endif()
 # ---- Example app (edit or add more) ----
 add_executable(sigma_capture_example
     examples/sigma_capture_example.cpp
+    src/ptp/fake_transport.cpp
 )
 
 target_link_libraries(sigma_capture_example PRIVATE ptp_sigma)

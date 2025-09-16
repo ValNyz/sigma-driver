@@ -16,6 +16,7 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(cam_tests
   integration/cam_tests.cpp
+  ../src/ptp/fake_transport.cpp
 )
 
 target_include_directories(cam_tests PRIVATE

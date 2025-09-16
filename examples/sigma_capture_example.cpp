@@ -4,20 +4,25 @@
 #include <thread>
 
 #include "ptp/usb_transport.h"
+#include "ptp/fake_transport.h"
 #include "utils/apex.h"
 #include "utils/log.h"
 #include "sigma/enum.h"
 #include "sigma/sigma_ptp.h"
 
-static void save(const std::string &path, const std::vector<uint8_t> &data) {
+static void save(const std::string &path, const std::vector<uint8_t> &data)
+{
   std::ofstream f(path, std::ios::binary);
   f.write(reinterpret_cast<const char *>(data.data()),
           (std::streamsize)data.size());
 }
 
-int main() {
+int main()
+{
   log_set_level(LogLevel::Debug);
-  try {
+  try
+  {
+    // FakeTransport usb;
     USBTransport usb;
     usb.open_first();
 
@@ -47,17 +52,17 @@ int main() {
     g1.shutterSpeed = encoded_shutterSpeed;
     cam.set_group(g1);
 
-    // 3) Set save destination in the camera via Group3
-    CamDataGroup3 g3;
-    DestToSave mode = DestToSave::InCamera;
-    g3.destToSave = mode;
-    cam.set_group(g3);
-
     CamDataGroup1 g1_bis = cam.get_group<CamDataGroup1>();
     LOG_INFO(
         "CamDataGroup1: iso mode=0x%01X/0x%01X iso=%u/%u shutter speed=%u/%u",
         g1_bis.isoAuto, g1.isoAuto, g1_bis.isoSpeed, g1.isoSpeed,
         g1_bis.shutterSpeed, g1.shutterSpeed);
+
+    // 3) Set save destination in the camera via Group3
+    CamDataGroup3 g3;
+    DestToSave mode = DestToSave::InCamera;
+    g3.destToSave = mode;
+    cam.set_group(g3);
 
     // 4) Trigger 1 capture without AF
     auto r = cam.snap(CaptureMode::NonAFCapt, 1);
@@ -69,13 +74,15 @@ int main() {
 
     // 6) Get the picture info
     PictFileInfo2 info = cam.get_pict_file_info2();
-    LOG_INFO("PictFileInfo2: %s/%s size=%u addr=0x%08X", info.PathName.c_str(),
+    LOG_INFO("PictFileInfo2: %s/%s size=%u bytes addr=0x%08X", info.PathName.c_str(),
              info.FileName.c_str(), info.FileSize, info.FileAddress);
 
     // Download the whole image (vendor chunk loop inside)
     // If you prefer a fixed chunk size, pass e.g. 128*1024.
     BigPartialPictFile img =
         cam.get_big_partial_pict_file(info.FileAddress, 0, info.FileSize);
+    LOG_INFO("BigPartialPictFile: size=%u bytes dataSize=%u bytes", img.AcquiredSize,
+              img.PartialData.size());
     // cam.get_object_vendor(256 * 1024);
     std::vector<uint8_t> bytes = img.PartialData;
 
@@ -89,10 +96,13 @@ int main() {
     // Clear CaptStatus DB entry
     cam.clear_image_db_single(st.ImageId);
 
+    cam.close_application();
     cam.close_session();
     usb.close();
     return 0;
-  } catch (const std::exception &e) {
+  }
+  catch (const std::exception &e)
+  {
     LOG_ERROR("Error: %s", e.what());
     return 1;
   }

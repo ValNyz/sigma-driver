@@ -26,7 +26,7 @@ Returns:
     ApiConfig: the set of values obtained from a camera.*/
 {
   // Vendor op: SigmaConfigApi, with a single parameter 0
-  auto r = transact(static_cast<std::uint16_t>(SigmaOp::ConfigApi), {0u},
+  auto r = transact(static_cast<std::uint16_t>(SigmaOp::ConfigApi), {},
                     nullptr, true);
 
   if (r.data.empty())
@@ -66,6 +66,9 @@ Args:
 Returns:
     CamCaptStatus: CamCaptStatus object.*/
 {
+  if (image_id == 0)
+    return get_cam_capt_status();
+
   auto r = transact(static_cast<std::uint16_t>(SigmaOp::GetCamCaptStatus),
                     {image_id}, nullptr, true);
   CamCaptStatus s;
