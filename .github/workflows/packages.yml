@@ -68,6 +68,11 @@ jobs:
                 --distribution ${{ matrix.series }} "Release $VERSION"
           fi
           dpkg-buildpackage -us -uc -b
+      - name: Collect debs
+        run: |
+            mkdir -p dist
+            shopt -s nullglob
+            mv -v ../*.deb ../*.changes ../*.buildinfo dist/ || true
       - name: Upload DEB artifacts
         uses: actions/upload-artifact@v4
         with:

@@ -16,7 +16,7 @@ BuildRequires:  pkgconfig(libusb-1.0)
 PTP communication library for Sigma cameras and a small example app.
 
 %prep
-%setup -q -n sigma-driver
+%setup -q -n sigma-driver-%{version}
 # Disable tests to avoid network fetch during build
 sed -i 's/^enable_testing/# enable_testing/' CMakeLists.txt || :
 sed -i 's/^add_subdirectory(\s*tests\s*)/# add_subdirectory(tests)/' CMakeLists.txt || :
