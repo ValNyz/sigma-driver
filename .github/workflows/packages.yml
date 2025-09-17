@@ -32,11 +32,12 @@ jobs:
       - name: Upload RPMs
         uses: actions/upload-artifact@v4
         with:
-          name: rpm-${{ env.VERSION }}
+          name: rpm-${{ env.VERSION }}-fc${{ matrix.fedora }}
           path: |
             rpmbuild/RPMS/**/*.rpm
             rpmbuild/SRPMS/*.src.rpm
           if-no-files-found: warn
+          overwrite: true
 
   deb:
     runs-on: ubuntu-latest
@@ -81,9 +82,10 @@ jobs:
       - name: Upload DEB artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: deb-${{ env.VERSION }}
+          name: deb-${{ env.VERSION }}-${{ matrix.series }}
           path: dist/*.deb
           if-no-files-found: warn
+          overwrite: true
   release:
     if: startsWith(github.ref, 'refs/tags/')
     needs: [rpm, deb]
