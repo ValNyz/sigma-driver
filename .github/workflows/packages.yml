@@ -1,0 +1,81 @@
+name: build-packages
+on:
+  push:
+    tags: ["v*"]   # build when you push a tag like v1.0.0
+  workflow_dispatch:
+
+jobs:
+  rpm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: { fedora: [40, 41, 42] }
+    container: fedora:${{ matrix.fedora }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Derive versions
+        run: |
+            echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV          # v1.0.0
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV    # 1.0.0
+      - name: Install deps
+        run: dnf -y install rpm-build rpmdevtools gcc-c++ cmake ninja-build pkgconfig libusb1-devel git
+      - name: Prepare rpmbuild tree and fetch Source0
+        run: |
+          rpmdev-setuptree
+          cp rpm/sigma-driver.spec ~/rpmbuild/SPECS/
+          spectool -g -R ~/rpmbuild/SPECS/sigma-driver.spec --define "tag ${TAG}" --define "version ${VERSION}"
+      - name: Build RPM
+        run: rpmbuild -ba ~/rpmbuild/SPECS/sigma-driver.spec \
+         --define "tag ${TAG}" --define "version ${VERSION}"
+      - name: Upload RPM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm-${{ env.VERSION }}
+          path: |
+            /root/rpmbuild/RPMS/**/*.rpm
+            /root/rpmbuild/SRPMS/*.src.rpm
+
+  deb:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        series: [jammy, noble]   # 22.04, 24.04
+        include:
+          - series: jammy
+            image: ubuntu:22.04
+          - series: noble
+            image: ubuntu:24.04
+    container: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Derive versions
+        run: |
+            echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV          # v1.0.0
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV    # 1.0.0
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential debhelper cmake pkg-config libusb-1.0-0-dev ninja-build dpkg-dev devscripts
+      - name: Update changelog version
+        run: |
+          dch --create --package sigma-driver --newversion "${VERSION}-1" \
+              --distribution ${{ matrix.series }} "Automated release ${VERSION}"
+          dpkg-buildpackage -us -uc -b
+      - name: Upload DEB artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-${{ env.VERSION }}
+          path: ../*.deb
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [rpm, deb]
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {path: dist}
+      - uses: softprops/action-gh-release@v2
+        with: { files: dist/**/* }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
