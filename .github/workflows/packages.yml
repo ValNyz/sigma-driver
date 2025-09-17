@@ -1,7 +1,8 @@
 name: build-packages
 on:
   push:
-    tags: ["v*"]   # build when you push a tag like v1.0.0
+    branches: ["**"]
+    tags: ["v*", "*"]   # build when you push a tag like v1.0.0
   workflow_dispatch:
 
 jobs:
@@ -25,8 +26,8 @@ jobs:
           cp rpm/sigma-driver.spec ~/rpmbuild/SPECS/
           spectool -g -R ~/rpmbuild/SPECS/sigma-driver.spec --define "tag ${TAG}" --define "version ${VERSION}"
       - name: Build RPM
-        run: rpmbuild -ba ~/rpmbuild/SPECS/sigma-driver.spec \
-         --define "tag ${TAG}" --define "version ${VERSION}"
+        run: |
+          rpmbuild -ba ~/rpmbuild/SPECS/sigma-driver.spec --define "tag ${TAG}" --define "version ${VERSION}"
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -55,8 +56,8 @@ jobs:
             echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV    # 1.0.0
       - name: Install deps
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential debhelper cmake pkg-config libusb-1.0-0-dev ninja-build dpkg-dev devscripts
+          apt-get update
+          apt-get install -y build-essential debhelper cmake pkg-config libusb-1.0-0-dev ninja-build dpkg-dev devscripts
       - name: Update changelog version
         run: |
           dch --create --package sigma-driver --newversion "${VERSION}-1" \

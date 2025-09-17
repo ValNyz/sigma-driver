@@ -1,6 +1,6 @@
-%global         tag %{?tag}%{!?tag:v%{version}}   # e.g. v1.0.0
+%global         tag %{?tag}%{!?tag:v%{version}}
 Name:           sigma-driver
-Version:        %{?version}%{!?version:0.0.0}     # e.g. 1.0.0
+Version:        %{?version}%{!?version:0.0.0}
 Release:        1%{?dist}
 Summary:        Sigma camera PTP driver and example app
 URL:            https://github.com/ValNyz/sigma_driver
