@@ -1,4 +1,5 @@
 %global         tag %{?tag}%{!?tag:v%{version}}
+%global         debug_package %{nil}
 Name:           sigma-driver
 Version:        %{?version}%{!?version:0.0.0}
 Release:        1%{?dist}

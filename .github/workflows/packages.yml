@@ -35,7 +35,6 @@ jobs:
           name: rpm-${{ env.VERSION }}-fc${{ matrix.fedora }}
           path: |
             rpmbuild/RPMS/**/*.rpm
-            rpmbuild/SRPMS/*.src.rpm
           if-no-files-found: warn
           overwrite: true
 
@@ -75,9 +74,9 @@ jobs:
       - name: Collect debs
         run: |
             mkdir -p dist
-            for f in ../*.deb ../*.changes ../*.buildinfo; do
+            for f in ../*.deb; do
                 [ -e "$f" ] || continue
-                mv -v "$f" dist/
+                mv -v "$f" "dist/sigma-driver_${{ env.VERSION }}-1_${{ matrix.series }}_amd64.deb"
             done
       - name: Upload DEB artifacts
         uses: actions/upload-artifact@v4
