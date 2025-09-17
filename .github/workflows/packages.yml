@@ -71,8 +71,10 @@ jobs:
       - name: Collect debs
         run: |
             mkdir -p dist
-            shopt -s nullglob
-            mv -v ../*.deb ../*.changes ../*.buildinfo dist/ || true
+            for f in ../*.deb ../*.changes ../*.buildinfo; do
+                [ -e "$f" ] || continue
+                mv -v "$f" dist/
+            done
       - name: Upload DEB artifacts
         uses: actions/upload-artifact@v4
         with:
