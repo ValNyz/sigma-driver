@@ -9,6 +9,7 @@ jobs:
   rpm:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix: { fedora: [40, 41, 42] }
     container: fedora:${{ matrix.fedora }}
     steps:
@@ -39,6 +40,7 @@ jobs:
   deb:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         series: [jammy, noble]   # 22.04, 24.04
         include:
