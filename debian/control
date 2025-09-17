@@ -2,7 +2,7 @@ Source: sigma-driver
 Section: libs
 Priority: optional
 Maintainer: Valentin Nyzam <valentin.nyzam@gmail.com>
-Build-Depends: debhelper-compat (= 13), cmake, pkg-config, libusb-1.0-0-dev, ninja-build
+Build-Depends: debhelper-compat (= 13), cmake, pkg-config, libusb-1.0-0-dev
 Standards-Version: 4.7.0
 Rules-Requires-Root: no
 
