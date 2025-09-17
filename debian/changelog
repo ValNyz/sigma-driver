@@ -1,0 +1,15 @@
+sigma-driver (1.0.0-1) unstable; urgency=medium
+
+  * Wed Sep 17 2025 Valentin Nyzam <valentin.nyzam@gmail.com> 1.0.0-1
+    - Initial release: PTP control for SIGMA fp-series cameras over USB.
+    - Provide C++17 library libptp_sigma using libusb-1.0.
+    - Implement session and application setup (open_session, config_api).
+    - Extensive tests of camera parameter groups:
+      - Group1: ISO and shutter speed (Apex encode helpers).
+      - Group2: exposure mode and image quality (DNG/JPEG).
+      - Group3: destination to save (in-camera or PC).
+    - Implement capture workflow:
+    - snap(NonAFCapt), wait_completion, get_pict_file_info2, file download,
+      clear_image_db_single.
+    - Install headers to /usr/include/sigma_driver/, library to /usr/lib*/,
+      and example tool sigma_capture_example to /usr/bin.

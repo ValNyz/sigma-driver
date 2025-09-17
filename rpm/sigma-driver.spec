@@ -1,12 +1,10 @@
+%global         tag %{?tag}%{!?tag:v%{version}}   # e.g. v1.0.0
 Name:           sigma-driver
-Version:        1.0.0-1
+Version:        %{?version}%{!?version:0.0.0}     # e.g. 1.0.0
 Release:        1%{?dist}
-Summary:        Sigma camera PTP driver and example executable.
-License:        MIT
-
-%global         tag 1.0
+Summary:        Sigma camera PTP driver and example app
 URL:            https://github.com/ValNyz/sigma_driver
-Source0:        %{url}/archive/refs/tags/%{tag}.tar.gz#/sigma_driver-%{tag}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{tag}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
