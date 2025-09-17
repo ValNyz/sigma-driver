@@ -3,6 +3,7 @@ Name:           sigma-driver
 Version:        %{?version}%{!?version:0.0.0}
 Release:        1%{?dist}
 Summary:        Sigma camera PTP driver and example app
+License:        MIT
 URL:            https://github.com/ValNyz/sigma_driver
 Source0:        %{url}/archive/refs/tags/%{tag}.tar.gz#/%{name}-%{version}.tar.gz
 
