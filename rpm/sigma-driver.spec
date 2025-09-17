@@ -22,7 +22,11 @@ sed -i 's/^enable_testing/# enable_testing/' CMakeLists.txt || :
 sed -i 's/^add_subdirectory(\s*tests\s*)/# add_subdirectory(tests)/' CMakeLists.txt || :
 
 %build
-cmake -S . -B build \  -DCMAKE_BUILD_TYPE=Release \  -DBUILD_SHARED_LIBS=ON \  -G Ninja
+cmake -S . -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_SHARED_LIBS=ON \
+  -DCMAKE_SKIP_RPATH=ON \
+  -G Ninja
 cmake --build build --parallel %{?_smp_mflags}
 
 %install
