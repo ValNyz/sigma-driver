@@ -1,28 +1,27 @@
 #!/usr/bin/make -f
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-export DEB_LDFLAGS_MAINT_APPEND = 
-export DEB_CXXFLAGS_MAINT_APPEND = 
+export DEB_LDFLAGS_MAINT_APPEND =
+export DEB_CXXFLAGS_MAINT_APPEND =
 
 %:
-	dh $@ --buildsystem=cmake --parallel
+	dh $@ --buildsystem=cmake --parallel --builddirectory=build
 
 override_dh_auto_configure:
-	dh_auto_configure -- -G Ninja -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release
 	# Disable tests to avoid network fetch
 	sed -i 's/^enable_testing/# enable_testing/' CMakeLists.txt || true
 	sed -i 's/^add_subdirectory(\s*tests\s*)/# add_subdirectory(tests)/' CMakeLists.txt || true
+	dh_auto_configure --builddirectory=build -- -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release
 
 override_dh_auto_build:
 	dh_auto_build --
 
 override_dh_auto_install:
-	mkdir -p debian/sigma-driver/usr/include/sigma_driver
-	cp -a include/* debian/sigma-driver/usr/include/sigma_driver/
+	mkdir -p debian/sigma-driver/usr/include/sigma-driver
+	cp -a include/* debian/sigma-driver/usr/include/sigma-driver/
 	# library
 	mkdir -p debian/sigma-driver/usr/lib/$(DEB_HOST_MULTIARCH)
-	if [ -f build/libptp_sigma.so ]; then cp -a build/libptp_sigma.so debian/sigma-driver/usr/lib/$(DEB_HOST_MULTIARCH)/; fi
-	if ls build/*/libptp_sigma.so* >/dev/null 2>&1; then cp -a build/*/libptp_sigma.so* debian/sigma-driver/usr/lib/$(DEB_HOST_MULTIARCH)/ || true; fi
-	if [ -f build/libptp_sigma.a ]; then cp -a build/libptp_sigma.a debian/sigma-driver/usr/lib/$(DEB_HOST_MULTIARCH)/; fi
+	[ -f build/libptp_sigma.so ] && cp -a build/libptp_sigma.so debian/sigma-driver/usr/lib/$(DEB_HOST_MULTIARCH)/ || true
+	[ -f build/libptp_sigma.a ] && cp -a build/libptp_sigma.a debian/sigma-driver/usr/lib/$(DEB_HOST_MULTIARCH)/ || true
 	# example
 	mkdir -p debian/sigma-driver/usr/bin
-	if [ -f build/sigma_capture_example ]; then install -m 0755 build/sigma_capture_example debian/sigma-driver/usr/bin/; fi
+	[ -f build/sigma_capture_example ] && install -m 0755 build/sigma_capture_example debian/sigma-driver/usr/bin/ || true

@@ -1,9 +1,11 @@
-%global         tag %{?tag}%{!?tag:v%{version}}   # e.g. v1.0.0
+%global         tag %{?tag}%{!?tag:v%{version}}
+%global         debug_package %{nil}
 Name:           sigma-driver
-Version:        %{?version}%{!?version:0.0.0}     # e.g. 1.0.0
+Version:        %{?version}%{!?version:0.0.0}
 Release:        1%{?dist}
 Summary:        Sigma camera PTP driver and example app
-URL:            https://github.com/ValNyz/sigma_driver
+License:        MIT
+URL:            https://github.com/ValNyz/sigma-driver
 Source0:        %{url}/archive/refs/tags/%{tag}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
@@ -15,18 +17,22 @@ BuildRequires:  pkgconfig(libusb-1.0)
 PTP communication library for Sigma cameras and a small example app.
 
 %prep
-%setup -q -n sigma_driver
+%setup -q -n sigma-driver-%{version}
 # Disable tests to avoid network fetch during build
 sed -i 's/^enable_testing/# enable_testing/' CMakeLists.txt || :
 sed -i 's/^add_subdirectory(\s*tests\s*)/# add_subdirectory(tests)/' CMakeLists.txt || :
 
 %build
-cmake -S . -B build \  -DCMAKE_BUILD_TYPE=Release \  -DBUILD_SHARED_LIBS=ON \  -G Ninja
+cmake -S . -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_SHARED_LIBS=ON \
+  -DCMAKE_SKIP_RPATH=ON \
+  -G Ninja
 cmake --build build --parallel %{?_smp_mflags}
 
 %install
-mkdir -p %{buildroot}%{_includedir}/sigma_driver
-cp -a include/* %{buildroot}%{_includedir}/sigma_driver/
+mkdir -p %{buildroot}%{_includedir}/sigma-driver
+cp -a include/* %{buildroot}%{_includedir}/sigma-driver/
 
 mkdir -p %{buildroot}%{_libdir}
 # copy any shared or static library that was built
@@ -40,9 +46,8 @@ if [ -f build/sigma_capture_example ]; then cp -a build/sigma_capture_example %{
 %files
 %license LICENSE
 %doc README.md
-%{_includedir}/sigma_driver/
+%{_includedir}/sigma-driver/
 %{_libdir}/libptp_sigma.so*
-%{_libdir}/libptp_sigma.a
 %{_bindir}/sigma_capture_example
 
 %changelog
@@ -57,5 +62,5 @@ if [ -f build/sigma_capture_example ]; then cp -a build/sigma_capture_example %{
   - Implement capture workflow:
   - snap(NonAFCapt), wait_completion, get_pict_file_info2, file download,
     clear_image_db_single.
-  - Install headers to /usr/include/sigma_driver/, library to /usr/lib*/,
+  - Install headers to /usr/include/sigma-driver/, library to /usr/lib*/,
     and example tool sigma_capture_example to /usr/bin.

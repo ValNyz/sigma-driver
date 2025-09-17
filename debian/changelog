@@ -11,5 +11,5 @@ sigma-driver (1.0.0-1) unstable; urgency=medium
     - Implement capture workflow:
     - snap(NonAFCapt), wait_completion, get_pict_file_info2, file download,
       clear_image_db_single.
-    - Install headers to /usr/include/sigma_driver/, library to /usr/lib*/,
+    - Install headers to /usr/include/sigma-driver/, library to /usr/lib*/,
       and example tool sigma_capture_example to /usr/bin.
