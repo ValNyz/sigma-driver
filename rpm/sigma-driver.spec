@@ -47,7 +47,6 @@ if [ -f build/sigma_capture_example ]; then cp -a build/sigma_capture_example %{
 %doc README.md
 %{_includedir}/sigma-driver/
 %{_libdir}/libptp_sigma.so*
-%{_libdir}/libptp_sigma.a
 %{_bindir}/sigma_capture_example
 
 %changelog
