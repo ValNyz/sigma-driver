@@ -21,21 +21,22 @@ jobs:
             echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV    # 1.0.0
       - name: Install deps
         run: dnf -y install rpm-build rpmdevtools gcc-c++ cmake ninja-build pkgconfig libusb1-devel git
-      - name: Prepare rpmbuild tree and fetch Source0
+      - name: Build RPM (workspace topdir)
         run: |
-          rpmdev-setuptree
-          cp rpm/sigma-driver.spec ~/rpmbuild/SPECS/
-          spectool -g -R ~/rpmbuild/SPECS/sigma-driver.spec --define "tag ${TAG}" --define "version ${VERSION}"
-      - name: Build RPM
-        run: |
-          rpmbuild -ba ~/rpmbuild/SPECS/sigma-driver.spec --define "tag ${TAG}" --define "version ${VERSION}"
-      - name: Upload RPM artifacts
+            echo "%_topdir $PWD/rpmbuild" > ~/.rpmmacros
+            rpmdev-setuptree
+            cp rpm/sigma-driver.spec rpmbuild/SPECS/
+            spectool -g -R rpmbuild/SPECS/sigma-driver.spec --define "tag ${TAG}" --define "version ${VERSION}"
+            rpmbuild -ba rpmbuild/SPECS/sigma-driver.spec --define "tag ${TAG}" --define "version ${VERSION}"
+
+      - name: Upload RPMs
         uses: actions/upload-artifact@v4
         with:
           name: rpm-${{ env.VERSION }}
           path: |
-            /root/rpmbuild/RPMS/**/*.rpm
-            /root/rpmbuild/SRPMS/*.src.rpm
+            rpmbuild/RPMS/**/*.rpm
+            rpmbuild/SRPMS/*.src.rpm
+          if-no-files-found: warn
 
   deb:
     runs-on: ubuntu-latest
@@ -60,7 +61,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y build-essential debhelper cmake pkg-config libusb-1.0-0-dev ninja-build dpkg-dev devscripts
-      - name: Update changelog version
+      - name: Update changelog version and build package.
         run: |
           DEB_VERSION="${VERSION}-1"
           if [ -f debian/changelog ]; then
@@ -81,7 +82,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deb-${{ env.VERSION }}
-          path: ../*.deb
+          path: dist/*.deb
+          if-no-files-found: warn
   release:
     if: startsWith(github.ref, 'refs/tags/')
     needs: [rpm, deb]
