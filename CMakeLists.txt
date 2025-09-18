@@ -33,13 +33,29 @@ find_package(PkgConfig QUIET)
 pkg_check_modules(LIBUSB QUIET libusb-1.0)
 target_link_libraries(ptp_sigma PUBLIC ${LIBUSB_LIBRARY})
 
-# ---- Example app (edit or add more) ----
-add_executable(sigma_capture_example
-    examples/sigma_capture_example.cpp
-    src/ptp/fake_transport.cpp
-)
+# In sigma-driver/CMakeLists.txt
+option(BUILD_EXAMPLES "Build example programs" ON)
 
-target_link_libraries(sigma_capture_example PRIVATE ptp_sigma)
+if(BUILD_EXAMPLES)
+	# ---- Example app (edit or add more) ----
+	add_executable(sigma_capture_example
+		examples/sigma_capture_example.cpp
+		src/ptp/fake_transport.cpp
+	)
+    add_executable(sigma_capture_example 
+        examples/sigma_capture_example.cpp
+        src/ptp/fake_transport.cpp
+    )
+    target_link_libraries(sigma_capture_example 
+        ptp_sigma 
+        ${LIBUSB_LIBRARIES}
+	)
+endif()
 
-enable_testing()
-add_subdirectory(tests)
+# In sigma-driver/CMakeLists.txt
+option(BUILD_TESTS "Build tests" ON)
+
+if(BUILD_TESTS)
+	enable_testing()
+	add_subdirectory(tests)
+endif()
