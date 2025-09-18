@@ -30,18 +30,8 @@ target_include_directories(ptp_sigma PUBLIC
 
 # libusb-1.0
 find_package(PkgConfig QUIET)
-if(PkgConfig_FOUND)
-    pkg_check_modules(LIBUSB1 QUIET libusb1-1.0)
-endif()
-if(LIBUSB_FOUND)
-    target_link_libraries(ptp_sigma PUBLIC PkgConfig::LIBUSB)
-else()
-    find_library(LIBUSB1_LIBRARY NAMES usb-1.0 libusb1-1.0)
-    if(NOT LIBUSB1_LIBRARY)
-        message(FATAL_ERROR "libusb1-1.0 not found. Install it (e.g. apt install libusb-1.0-0-dev).")
-    endif()
-    target_link_libraries(ptp_sigma PUBLIC ${LIBUSB1_LIBRARY})
-endif()
+pkg_check_modules(LIBUSB QUIET libusb-1.0)
+target_link_libraries(ptp_sigma PUBLIC ${LIBUSB_LIBRARY})
 
 # ---- Example app (edit or add more) ----
 add_executable(sigma_capture_example
