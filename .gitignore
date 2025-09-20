@@ -1,5 +1,7 @@
 .vscode/
+.cache/
 build/
 *.DNG
 *.JPEG
 .clang_format
+*.zip

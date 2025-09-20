@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cstddef>
 #include <cstdarg>
+#include <functional>
 
 // in a header before your LOG_* macros
 #if defined(_WIN32)
@@ -14,7 +15,7 @@
 enum class LogLevel : uint8_t { Error=0, Warning=1, Info=2, Debug=3 };
 
 // External sink signature. Receives a ready-to-print UTF-8 line (no newline).
-using LogSink = void(*)(LogLevel level, const char* message);
+using LogSink = std::function<void(LogLevel level, const char* message)>;
 
 // Configuration
 void        log_set_level(LogLevel lvl);

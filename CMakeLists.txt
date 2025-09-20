@@ -37,25 +37,21 @@ target_link_libraries(ptp_sigma PUBLIC ${LIBUSB_LIBRARY})
 option(BUILD_EXAMPLES "Build example programs" ON)
 
 if(BUILD_EXAMPLES)
-	# ---- Example app (edit or add more) ----
-	add_executable(sigma_capture_example
-		examples/sigma_capture_example.cpp
-		src/ptp/fake_transport.cpp
-	)
-    add_executable(sigma_capture_example 
+    # ---- Example app (edit or add more) ----
+    add_executable(sigma_capture_example
         examples/sigma_capture_example.cpp
         src/ptp/fake_transport.cpp
     )
-    target_link_libraries(sigma_capture_example 
-        ptp_sigma 
+    target_link_libraries(sigma_capture_example
+        ptp_sigma
         ${LIBUSB_LIBRARIES}
-	)
+    )
 endif()
 
 # In sigma-driver/CMakeLists.txt
 option(BUILD_TESTS "Build tests" ON)
 
 if(BUILD_TESTS)
-	enable_testing()
-	add_subdirectory(tests)
+    enable_testing()
+    add_subdirectory(tests)
 endif()

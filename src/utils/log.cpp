@@ -11,7 +11,7 @@
 
 static std::atomic<LogLevel> g_level{LogLevel::Info};
 static std::mutex g_mu;
-static LogSink g_sink = nullptr;
+static LogSink g_sink;
 
 // Default sink: prints timestamp, level, and message to stderr.
 static const char *lvl_name(LogLevel l)
@@ -57,7 +57,7 @@ LogLevel log_get_level() { return g_level.load(std::memory_order_relaxed); }
 void log_set_sink(LogSink sink)
 {
   std::lock_guard<std::mutex> lk(g_mu);
-  g_sink = sink;
+  g_sink = std::move(sink);
 }
 
 static void emit(LogLevel lvl, const char *line)
