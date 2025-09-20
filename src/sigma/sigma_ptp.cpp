@@ -150,7 +150,7 @@ void SigmaCamera::clear_image_db_single(std::uint32_t image_id)
 {
   std::vector<std::uint8_t> payload(10, 0x00); // undocumented 10 zero bytes
   (void)transact(static_cast<std::uint16_t>(SigmaOp::ClearImageDBSingle),
-                 {}, &payload, false);
+                 {image_id}, &payload, false);
   LOG_INFO("ClearImageDBSingle image_id=%u", image_id);
 }
 
@@ -213,8 +213,7 @@ Examples:
     You can obtain a RGB array from a returned JPEG data as follows::
 
         pict = camera.get_view_frame()
-        img = cv2.imdecode(np.frombuffer(pict.Data, np.uint8),
-cv2.IMREAD_COLOR)*/
+*/
 {
   auto r = transact(static_cast<std::uint16_t>(SigmaOp::GetViewFrame), {},
                     nullptr, true);
