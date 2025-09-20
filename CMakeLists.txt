@@ -9,6 +9,10 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
 endif()
 
+# Use pkg-config for dependencies
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
+
 # ---- Library: core + vendor ----
 add_library(ptp_sigma
     src/utils/apex.cpp
@@ -21,17 +25,12 @@ add_library(ptp_sigma
 
 target_include_directories(ptp_sigma PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${LIBUSB_INCLUDE_DIRS}
 )
 
-# target_compile_options(sigma_ptp PRIVATE
-#     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
-#     $<$<CXX_COMPILER_ID:MSVC>:/W4 /permissive->
-# )
-
-# libusb-1.0
-find_package(PkgConfig QUIET)
-pkg_check_modules(LIBUSB QUIET libusb-1.0)
-target_link_libraries(ptp_sigma PUBLIC ${LIBUSB_LIBRARY})
+target_link_libraries(ptp_sigma PUBLIC
+    ${LIBUSB_LIBRARY}
+)
 
 # In sigma-driver/CMakeLists.txt
 option(BUILD_EXAMPLES "Build example programs" ON)
@@ -40,7 +39,6 @@ if(BUILD_EXAMPLES)
     # ---- Example app (edit or add more) ----
     add_executable(sigma_capture_example
         examples/sigma_capture_example.cpp
-        src/ptp/fake_transport.cpp
     )
     target_link_libraries(sigma_capture_example
         ptp_sigma

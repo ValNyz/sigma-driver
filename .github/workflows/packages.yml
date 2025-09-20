@@ -9,11 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: { fedora: [40, 41, 42] }
+      matrix:
+        fedora: [40, 41, 42]
     container: fedora:${{ matrix.fedora }}
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
+
       - name: Derive versions
         run: |
             echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV          # v1.0.0
