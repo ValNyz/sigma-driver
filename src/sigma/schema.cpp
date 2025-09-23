@@ -9,7 +9,8 @@
 #include "sigma/schema.h"
 
 // ---------------- CamDataGroup1 ----------------
-std::vector<std::uint8_t> CamDataGroup1::encode() const {
+std::vector<std::uint8_t> CamDataGroup1::encode() const
+{
   std::uint16_t fp = 0;
   if (shutterSpeed)
     fp |= FP_ShutterSpeed;
@@ -53,11 +54,13 @@ std::vector<std::uint8_t> CamDataGroup1::encode() const {
   return out;
 }
 
-void CamDataGroup1::decode(const std::vector<std::uint8_t> &rawdata) {
+void CamDataGroup1::decode(const std::vector<std::uint8_t> &rawdata)
+{
   size_t i = 0;
   (void)get_8(rawdata, i); // _Header
   std::uint16_t fp = get_16be(rawdata, i);
-  auto has = [&](std::uint16_t b) { return (fp & b) != 0; };
+  auto has = [&](std::uint16_t b)
+  { return (fp & b) != 0; };
 
   if (has(FP_ShutterSpeed))
     shutterSpeed = get_8(rawdata, i);
@@ -126,7 +129,8 @@ void CamDataGroup1::decode(const std::vector<std::uint8_t> &rawdata) {
 }
 
 // ---------------- CamDataGroup2 ----------------
-std::vector<std::uint8_t> CamDataGroup2::encode() const {
+std::vector<std::uint8_t> CamDataGroup2::encode() const
+{
   std::uint16_t fp = 0;
   if (aeMeteringMode)
     fp |= FP_AE;
@@ -176,11 +180,13 @@ std::vector<std::uint8_t> CamDataGroup2::encode() const {
   return out;
 }
 
-void CamDataGroup2::decode(const std::vector<std::uint8_t> &raw) {
+void CamDataGroup2::decode(const std::vector<std::uint8_t> &raw)
+{
   size_t i = 0;
   (void)get_8(raw, i);
   std::uint16_t fp = get_16be(raw, i);
-  auto has = [&](std::uint16_t b) { return (fp & b) != 0; };
+  auto has = [&](std::uint16_t b)
+  { return (fp & b) != 0; };
   if (has(FP_Drive))
     driveMode = static_cast<DriveMode>(get_8(raw, i));
   else
@@ -237,7 +243,8 @@ void CamDataGroup2::decode(const std::vector<std::uint8_t> &raw) {
 }
 
 // ---------------- CamDataGroup3 ----------------
-std::vector<std::uint8_t> CamDataGroup3::encode() const {
+std::vector<std::uint8_t> CamDataGroup3::encode() const
+{
   std::uint16_t fp = 0;
   if (lensTeleFocalLength)
     fp |= FP_Tele;
@@ -283,11 +290,13 @@ std::vector<std::uint8_t> CamDataGroup3::encode() const {
   return out;
 }
 
-void CamDataGroup3::decode(const std::vector<std::uint8_t> &raw) {
+void CamDataGroup3::decode(const std::vector<std::uint8_t> &raw)
+{
   size_t i = 0;
   (void)get_8(raw, i);
   std::uint16_t fp = get_16be(raw, i);
-  auto has = [&](std::uint16_t b) { return (fp & b) != 0; };
+  auto has = [&](std::uint16_t b)
+  { return (fp & b) != 0; };
   if (has(FP__Reserved0))
     (void)get_8(raw, i);
   if (has(FP__Reserved1))
@@ -342,7 +351,8 @@ void CamDataGroup3::decode(const std::vector<std::uint8_t> &raw) {
 }
 
 // ---------------- CamDataGroup4 ----------------
-std::vector<std::uint8_t> CamDataGroup4::encode() const {
+std::vector<std::uint8_t> CamDataGroup4::encode() const
+{
   std::uint16_t fp = 0;
   if (contShootSpeed)
     fp |= FP_Cont;
@@ -384,7 +394,8 @@ std::vector<std::uint8_t> CamDataGroup4::encode() const {
     put_8(out, static_cast<std::uint8_t>(*dngQuality));
   if (fillLight)
     put_8(out, static_cast<std::uint8_t>(*fillLight));
-  if (hasLOC) {
+  if (hasLOC)
+  {
     put_8(out, static_cast<std::uint8_t>(
                    locDistortion.value_or(LOCDistortion::Off)));
     put_8(out, static_cast<std::uint8_t>(locChromaticAberration.value_or(
@@ -406,11 +417,13 @@ std::vector<std::uint8_t> CamDataGroup4::encode() const {
   return out;
 }
 
-void CamDataGroup4::decode(const std::vector<std::uint8_t> &raw) {
+void CamDataGroup4::decode(const std::vector<std::uint8_t> &raw)
+{
   size_t i = 0;
   (void)get_8(raw, i);
   std::uint16_t fp = get_16be(raw, i);
-  auto has = [&](std::uint16_t b) { return (fp & b) != 0; };
+  auto has = [&](std::uint16_t b)
+  { return (fp & b) != 0; };
   if (has(FP__Reserved0))
     (void)get_8(raw, i);
   if (has(FP__Reserved1))
@@ -447,14 +460,17 @@ void CamDataGroup4::decode(const std::vector<std::uint8_t> &raw) {
     fillLight = static_cast<std::int8_t>(get_8(raw, i));
   else
     fillLight.reset();
-  if (has(FP_LOC)) {
+  if (has(FP_LOC))
+  {
     locDistortion = static_cast<LOCDistortion>(get_8(raw, i));
     locChromaticAberration = static_cast<LOCChromaticAberration>(get_8(raw, i));
     locDiffraction = static_cast<LOCDiffraction>(get_8(raw, i));
     locVignetting = static_cast<LOCVignetting>(get_8(raw, i));
     locColorShade = static_cast<LOCColorShade>(get_8(raw, i));
     locColorShadeAcq = static_cast<LOCColorShadeAcq>(get_8(raw, i));
-  } else {
+  }
+  else
+  {
     locDistortion.reset();
     locChromaticAberration.reset();
     locDiffraction.reset();
@@ -474,7 +490,8 @@ void CamDataGroup4::decode(const std::vector<std::uint8_t> &raw) {
 }
 
 // ---------------- CamDataGroup5 ----------------
-std::vector<std::uint8_t> CamDataGroup5::encode() const {
+std::vector<std::uint8_t> CamDataGroup5::encode() const
+{
   if (intervalTimerSecond.has_value() != intervalTimerFrame.has_value())
     throw std::invalid_argument("IntervalTimerSecond and IntervalTimerFrame "
                                 "must both be set or both null");
@@ -495,7 +512,8 @@ std::vector<std::uint8_t> CamDataGroup5::encode() const {
   std::vector<std::uint8_t> out;
   put_8(out, 0x00);
   put_16be(out, fp);
-  if (interval) {
+  if (interval)
+  {
     put_16le(out, *intervalTimerSecond);
     put_8(out, *intervalTimerFrame);
     put_16le(out, intervalTimerSecondRemain.value_or(0));
@@ -513,18 +531,23 @@ std::vector<std::uint8_t> CamDataGroup5::encode() const {
   return out;
 }
 
-void CamDataGroup5::decode(const std::vector<std::uint8_t> &raw) {
+void CamDataGroup5::decode(const std::vector<std::uint8_t> &raw)
+{
   size_t i = 0;
   (void)get_8(raw, i);
   std::uint16_t fp = get_16be(raw, i);
-  auto has = [&](std::uint16_t b) { return (fp & b) != 0; };
+  auto has = [&](std::uint16_t b)
+  { return (fp & b) != 0; };
 
-  if (has(FP_Int)) {
+  if (has(FP_Int))
+  {
     intervalTimerSecond = get_16le(raw, i);
     intervalTimerFrame = get_8(raw, i);
     intervalTimerSecondRemain = get_16le(raw, i);
     intervalTimerFrameRemain = get_8(raw, i);
-  } else {
+  }
+  else
+  {
     intervalTimerSecond.reset();
     intervalTimerFrame.reset();
     intervalTimerSecondRemain.reset();
@@ -573,7 +596,8 @@ void CamDataGroup5::decode(const std::vector<std::uint8_t> &raw) {
 }
 
 // ---------- CamCaptStatus ----------
-void CamCaptStatus::decode(const std::vector<std::uint8_t> &raw) {
+void CamCaptStatus::decode(const std::vector<std::uint8_t> &raw)
+{
   // Layout:
   // [0]_Header u8, [1]ImageId u8, [2]ImageDBHead u8, [3]ImageDBTail u8,
   // [4..5]CaptStatus u16 LE, [6]DestToSave u8, [7]_Parity u8
@@ -587,7 +611,8 @@ void CamCaptStatus::decode(const std::vector<std::uint8_t> &raw) {
 }
 
 // ---------- SnapCommand ----------
-std::vector<std::uint8_t> SnapCommand::encode() const {
+std::vector<std::uint8_t> SnapCommand::encode() const
+{
   std::vector<std::uint8_t> out;
   out.reserve(4);
   out.push_back(0x00); // _Header
@@ -598,7 +623,8 @@ std::vector<std::uint8_t> SnapCommand::encode() const {
 }
 
 // ---------- PictFileInfo2 ----------
-void PictFileInfo2::decode(const std::vector<std::uint8_t> &raw) {
+void PictFileInfo2::decode(const std::vector<std::uint8_t> &raw)
+{
   // Layout (little-endian):
   // [0..11]  Unknown (12 bytes)
   // [12..15] FileAddress u32
@@ -628,7 +654,8 @@ void PictFileInfo2::decode(const std::vector<std::uint8_t> &raw) {
 }
 
 // ---------- BigPartialPictFile ----------
-void BigPartialPictFile::decode(const std::vector<std::uint8_t> &raw) {
+void BigPartialPictFile::decode(const std::vector<std::uint8_t> &raw)
+{
   if (raw.size() < 4)
     throw std::runtime_error("BigPartialPictFile: short buffer");
   AcquiredSize = read_32le(raw.data());
@@ -637,13 +664,15 @@ void BigPartialPictFile::decode(const std::vector<std::uint8_t> &raw) {
 }
 
 // ---------- ViewFrame ----------
-void ViewFrame::decode(const std::vector<std::uint8_t> &raw) {
+void ViewFrame::decode(const std::vector<std::uint8_t> &raw)
+{
   if (raw.size() < 10)
     throw std::runtime_error("ViewFrame: short buffer");
   Data.assign(raw.begin() + 10, raw.end());
 }
 
-void ApiConfig::decode(const std::vector<std::uint8_t> &raw) {
+void ApiConfig::decode(const std::vector<std::uint8_t> &raw)
+{
   camera_model_.clear();
   serial_number_.clear();
   firmware_version_.clear();
@@ -658,7 +687,8 @@ void ApiConfig::decode(const std::vector<std::uint8_t> &raw) {
   if (raw.size() < index_end)
     return;
 
-  for (uint32_t i = 0; i < dir_cnt; ++i) {
+  for (uint32_t i = 0; i < dir_cnt; ++i)
+  {
     const size_t off = 8 + i * 12;
     const uint16_t tag = read_16le(&raw[off + 0]);
     const auto type = static_cast<DirectoryType>(read_16le(&raw[off + 2]));
@@ -670,9 +700,12 @@ void ApiConfig::decode(const std::vector<std::uint8_t> &raw) {
 
     // load payload
     std::vector<uint8_t> payload;
-    if (nbytes <= 4) {
+    if (nbytes <= 4)
+    {
       payload.assign(v4, v4 + nbytes);
-    } else {
+    }
+    else
+    {
       const uint32_t ofs = read_32le(v4); // offset from start of blob
       if (ofs + nbytes > raw.size())
         continue;
@@ -680,8 +713,10 @@ void ApiConfig::decode(const std::vector<std::uint8_t> &raw) {
     }
 
     // map tags we care about
-    switch (tag) {
-    case 1: { // CameraModel (String)
+    switch (tag)
+    {
+    case 1:
+    { // CameraModel (String)
       std::string s(reinterpret_cast<const char *>(payload.data()),
                     payload.size());
       if (!s.empty() && s.back() == '\0')
@@ -689,7 +724,8 @@ void ApiConfig::decode(const std::vector<std::uint8_t> &raw) {
       camera_model_ = std::move(s);
       break;
     }
-    case 2: { // SerialNumber (String)
+    case 2:
+    { // SerialNumber (String)
       std::string s(reinterpret_cast<const char *>(payload.data()),
                     payload.size());
       if (!s.empty() && s.back() == '\0')
@@ -697,7 +733,8 @@ void ApiConfig::decode(const std::vector<std::uint8_t> &raw) {
       serial_number_ = std::move(s);
       break;
     }
-    case 3: { // FirmwareVersion (String)
+    case 3:
+    { // FirmwareVersion (String)
       std::string s(reinterpret_cast<const char *>(payload.data()),
                     payload.size());
       if (!s.empty() && s.back() == '\0')
@@ -705,13 +742,17 @@ void ApiConfig::decode(const std::vector<std::uint8_t> &raw) {
       firmware_version_ = std::move(s);
       break;
     }
-    case 5: { // CommunicationVersion (Float32 or Float64, count>=1)
-      if (type == DirectoryType::Float32 && payload.size() >= 4) {
+    case 5:
+    { // CommunicationVersion (Float32 or Float64, count>=1)
+      if (type == DirectoryType::Float32 && payload.size() >= 4)
+      {
         uint32_t u = read_32le(payload.data());
         float f;
         std::memcpy(&f, &u, 4);
         communication_version_ = static_cast<double>(f);
-      } else if (type == DirectoryType::Float64 && payload.size() >= 8) {
+      }
+      else if (type == DirectoryType::Float64 && payload.size() >= 8)
+      {
         uint64_t u =
             (uint64_t)payload[0] | ((uint64_t)payload[1] << 8) |
             ((uint64_t)payload[2] << 16) | ((uint64_t)payload[3] << 24) |
@@ -729,7 +770,8 @@ void ApiConfig::decode(const std::vector<std::uint8_t> &raw) {
   }
 }
 
-std::string ApiConfig::to_string() const {
+std::string ApiConfig::to_string() const
+{
   std::ostringstream oss;
   oss << "ApiConfig(CameraModel=" << camera_model_
       << ", SerialNumber=" << serial_number_
@@ -738,44 +780,198 @@ std::string ApiConfig::to_string() const {
   return oss.str();
 }
 
-// int main() {
-//     CamDataGroup1 g;
+// Build a directory blob
+std::vector<uint8_t> CamDataGroupFocus::encode() const
+{
+  std::vector<Entry> xs;
 
-//     // set the first 8 fields (others are omitted by encode())
-//     g.shutterSpeed = 0x0A;                 // APEX step
-//     g.aperture     = 0x14;                 // APEX step
-//     g.programShift = ProgramShift::Plus;
-//     g.isoAuto      = ISOAuto::Auto;
-//     g.isoSpeed     = 0x24;                 // APEX step
-//     g.expComp      = 0x80;                 // APEX step
-//     g.abValue      = 0x02;
-//     g.abSetting    = ABSetting::AB3ZeroMinusPlus;
+  auto push_u8 = [&](uint16_t tag, uint8_t v)
+  {
+    xs.push_back({tag, DirectoryType::UInt8, 1, std::vector<uint8_t>{v}});
+  };
+  auto push_u8_enum = [&](uint16_t tag, uint8_t v)
+  {
+    xs.push_back({tag, DirectoryType::UInt8, 1, std::vector<uint8_t>{v}});
+  };
+  auto push_u8_vec = [&](uint16_t tag, const std::vector<uint8_t> &v)
+  {
+    xs.push_back({tag, DirectoryType::UInt8, static_cast<uint32_t>(v.size()), v});
+  };
 
-//     // encode to bytes
-//     std::vector<std::uint8_t> bytes = g.encode();
+  if (focusMode)
+    push_u8_enum(0x1, static_cast<uint8_t>(*focusMode));
+  if (afLock)
+    push_u8_enum(0x2, static_cast<uint8_t>(*afLock));
+  if (faceEyeAF)
+    push_u8_enum(0x3, static_cast<uint8_t>(*faceEyeAF));
+  if (focusArea)
+    push_u8_enum(0x10, static_cast<uint8_t>(*focusArea));
+  if (onePointSelection)
+    push_u8_enum(0x11, static_cast<uint8_t>(*onePointSelection));
+  if (dmfSize)
+    push_u8(0x12, *dmfSize);
+  if (dmfPos)
+    push_u8_vec(0x13, *dmfPos);
+  if (preConstAF)
+    push_u8_enum(0x51, static_cast<uint8_t>(*preConstAF));
+  if (focusLimit)
+    push_u8_enum(0x52, static_cast<uint8_t>(*focusLimit));
 
-//     // dump hex
-//     std::cout << "Encoded (" << bytes.size() << " bytes): ";
-//     for (auto b : bytes) std::cout << std::hex << std::setw(2) <<
-//     std::setfill('0') << int(b) << " "; std::cout << std::dec << "\n";
+  // ---- serialize ----
+  const uint32_t header_size = 8;
+  const uint32_t entry_size = 12;
+  const uint32_t index_size = header_size + (uint32_t)xs.size() * entry_size;
 
-//     // decode back
-//     CamDataGroup1 parsed;
-//     parsed.decode(bytes);
+  std::vector<uint8_t> idx;
+  idx.resize(index_size, 0x00);
+  // DataLength placeholder (filled later)
+  // DirectoryCount
+  // put_32le(idx, 0); // bytes 0..3
+  put_32le_at(idx, index_size, 0);
 
-//     // read decoded values
-//     if (parsed.shutterSpeed) std::cout << "ShutterSpeed: " <<
-//     int(*parsed.shutterSpeed) << "\n"; if (parsed.aperture)     std::cout <<
-//     "Aperture: "     << int(*parsed.aperture)     << "\n"; if
-//     (parsed.programShift) std::cout << "ProgramShift: " <<
-//     int(static_cast<std::uint8_t>(*parsed.programShift)) << "\n"; if
-//     (parsed.isoAuto)      std::cout << "ISOAuto: "      <<
-//     int(static_cast<std::uint8_t>(*parsed.isoAuto))      << "\n"; if
-//     (parsed.isoSpeed)     std::cout << "ISOSpeed: "     <<
-//     int(*parsed.isoSpeed)     << "\n"; if (parsed.expComp)      std::cout <<
-//     "ExpComp: "      << int(*parsed.expComp)      << "\n"; if
-//     (parsed.abValue)      std::cout << "ABValue: "      <<
-//     int(*parsed.abValue)      << "\n"; if (parsed.abSetting)    std::cout <<
-//     "ABSetting: "    << int(static_cast<std::uint8_t>(*parsed.abSetting)) <<
-//     "\n";
-// }
+  // write DirectoryCount at bytes 4..7
+  put_32le_at(idx, xs.size(), 4);
+
+  std::vector<uint8_t> data;
+
+  for (size_t i = 0; i < xs.size(); ++i)
+  {
+    const auto &e = xs[i];
+    const size_t off = header_size + i * entry_size;
+
+    // Tag
+    {
+      put_16le_at(idx, e.tag, off);
+    }
+
+    // Type (UInt8=0x0001)
+    {
+      put_16le_at(idx, static_cast<uint8_t>(e.type), off+2);
+    }
+
+    // Count
+    {
+      put_32le_at(idx, e.count, off+4);
+    }
+
+    // Payload with 4-byte padding
+    std::vector<uint8_t> p = e.payload;
+    if (p.size() % 4)
+      p.resize(p.size() + (4 - p.size() % 4), 0x00);
+
+    if (p.size() <= 4)
+    {
+      std::memcpy(&idx[off + 8], p.data(), p.size());
+    }
+    else
+    {
+      const uint32_t ofs = static_cast<uint32_t>(idx.size() + data.size());
+      put_32le_at(idx, ofs, off+8);
+    }
+  }
+
+  return idx;
+}
+
+// Parse a directory blob
+void CamDataGroupFocus::decode(const std::vector<uint8_t> &raw)
+{
+  reset_();
+
+  if (raw.size() < 8)
+    return;
+
+  const uint32_t data_len = read_32le(&raw[0]);
+  const uint32_t dir_cnt = read_32le(&raw[4]);
+  const size_t index_end = 8 + (size_t)dir_cnt * 12;
+  if (raw.size() < index_end)
+    return;
+
+  for (uint32_t i = 0; i < dir_cnt; ++i)
+  {
+    const size_t off = 8 + i * 12;
+
+    const uint16_t tag = read_16le(&raw[off + 0]);
+    const uint16_t type = read_16le(&raw[off + 2]);
+    const uint32_t cnt = read_32le(&raw[off + 4]);
+    const uint8_t *v4 = &raw[off + 8];
+
+    // compute payload length (UInt8 array)
+    const uint32_t nbytes = cnt;
+
+    std::vector<uint8_t> payload;
+    if (nbytes <= 4)
+    {
+      payload.assign(v4, v4 + nbytes);
+    }
+    else
+    {
+      const uint32_t ofs = read_32le(v4);
+      if (ofs + nbytes > raw.size())
+        continue;
+      payload.assign(raw.begin() + ofs, raw.begin() + ofs + nbytes);
+    }
+
+    if (payload.empty())
+      continue;
+
+    switch (tag)
+    {
+    case 0x1:
+      focusMode = static_cast<FocusMode>(payload[0]);
+      break;
+    case 0x2:
+      afLock = static_cast<AFLock>(payload[0]);
+      break;
+    case 0x3:
+      faceEyeAF = static_cast<FaceEyeAF>(payload[0]);
+      break;
+    case 0x4:
+      faceEyeAFStatus = static_cast<FaceEyeAFStatus>(payload[0]);
+      break;
+    case 0x10:
+      focusArea = static_cast<FocusArea>(payload[0]);
+      break;
+    case 0x11:
+      onePointSelection = static_cast<OnePointSelection>(payload[0]);
+      break;
+    case 0x12:
+      dmfSize = payload[0];
+      break;
+    case 0x13:
+      dmfPos = payload;
+      break;
+    case 0x14:
+      dmfDetection = payload;
+      break;
+    case 0x51:
+      preConstAF = static_cast<PreConstAF>(payload[0]);
+      break;
+    case 0x52:
+      focusLimit = static_cast<FocusLimit>(payload[0]);
+      break;
+    default:
+      break;
+    }
+  }
+}
+
+// --- method ---
+std::string CamDataGroupFocus::to_string() const {
+  std::ostringstream os;
+  bool first = true;
+  auto sep = [&](bool have){ if (have) { if (!first) os << ", "; first = false; } return have; };
+
+  if (sep(!!focusMode))       os << "focusMode=" << (int)*focusMode;
+  if (sep(!!afLock))          os << "afLock=" << (int)*afLock;
+  if (sep(!!faceEyeAF))       os << "faceEyeAF=" << (int)*faceEyeAF;
+  if (sep(!!faceEyeAFStatus)) os << "faceEyeAFStatus=" << (int)*faceEyeAFStatus;
+  if (sep(!!focusArea))       os << "focusArea=" << (int)*focusArea;
+  if (sep(!!onePointSelection)) os << "onePointSelection=" << (int)*onePointSelection;
+  if (sep(!!dmfSize))         os << "dmfSize=" << (int)*dmfSize;
+  if (sep(!!dmfPos))          os << "dmfPos=" << bin2hex(*dmfPos);
+  if (sep(!!dmfDetection))    os << "dmfDetection=" << bin2hex(*dmfDetection);
+  if (sep(!!preConstAF))      os << "preConstAF=" << (int)*preConstAF;
+  if (sep(!!focusLimit))      os << "focusLimit=" << (int)*focusLimit;
+  return os.str();
+}
