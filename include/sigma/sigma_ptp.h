@@ -84,16 +84,19 @@ public:
   template <class GroupT>
   GroupT get_group();
   template <class GroupT>
-  void set_group(const GroupT &g);
+  CameraPTP::Response set_group(const GroupT &g);
 
   // raw bytes
-  std::vector<std::uint8_t> get_bytes(SigmaOp op);
-  void set_bytes(SigmaOp op, const std::vector<std::uint8_t> &payload);
+  // std::vector<std::uint8_t> get_bytes(SigmaOp op);
+  // void set_bytes(SigmaOp op, const std::vector<std::uint8_t> &payload);
 
   CamCaptStatus get_cam_capt_status();
   CamCaptStatus get_cam_capt_status(std::uint8_t image_id);
   CamCaptStatus wait_completion(std::uint8_t image_id, int polls = 30,
                                 int sleep_ms = 1000);
+
+  CameraPTP::Response set_cam_data_group_focus(const CamDataGroupFocus& focus);
+  CamDataGroupFocus get_cam_data_group_focus();
 
   uint16_t snap(const SnapCommand &cmd);
   uint16_t snap(CaptureMode mode, std::uint8_t amount); // convenience
@@ -120,8 +123,8 @@ extern template CamDataGroup3 SigmaCamera::get_group<CamDataGroup3>();
 extern template CamDataGroup4 SigmaCamera::get_group<CamDataGroup4>();
 extern template CamDataGroup5 SigmaCamera::get_group<CamDataGroup5>();
 
-extern template void SigmaCamera::set_group<CamDataGroup1>(const CamDataGroup1 &);
-extern template void SigmaCamera::set_group<CamDataGroup2>(const CamDataGroup2 &);
-extern template void SigmaCamera::set_group<CamDataGroup3>(const CamDataGroup3 &);
-extern template void SigmaCamera::set_group<CamDataGroup4>(const CamDataGroup4 &);
-extern template void SigmaCamera::set_group<CamDataGroup5>(const CamDataGroup5 &);
+extern template CameraPTP::Response SigmaCamera::set_group<CamDataGroup1>(const CamDataGroup1 &);
+extern template CameraPTP::Response SigmaCamera::set_group<CamDataGroup2>(const CamDataGroup2 &);
+extern template CameraPTP::Response SigmaCamera::set_group<CamDataGroup3>(const CamDataGroup3 &);
+extern template CameraPTP::Response SigmaCamera::set_group<CamDataGroup4>(const CamDataGroup4 &);
+extern template CameraPTP::Response SigmaCamera::set_group<CamDataGroup5>(const CamDataGroup5 &);

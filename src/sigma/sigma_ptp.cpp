@@ -1,5 +1,4 @@
 #include <chrono>
-#include <iostream>
 #include <stdexcept>
 #include <thread>
 
@@ -26,8 +25,8 @@ Returns:
     ApiConfig: the set of values obtained from a camera.*/
 {
   // Vendor op: SigmaConfigApi, with a single parameter 0
-  auto r = transact(static_cast<std::uint16_t>(SigmaOp::ConfigApi), {},
-                    nullptr, true);
+  auto r = transact(static_cast<std::uint16_t>(SigmaOp::ConfigApi), {}, nullptr,
+                    true);
 
   if (r.data.empty())
     throw std::runtime_error("config_api: empty data");
@@ -48,8 +47,29 @@ void SigmaCamera::close_application()
   LOG_INFO("CloseApplication sent, resp=0x%04X", r.response_code);
 }
 
+CameraPTP::Response SigmaCamera::set_cam_data_group_focus(const CamDataGroupFocus &focus)
+{
+  std::vector<std::uint8_t> payload = focus.encode();
+  auto r = transact(static_cast<std::uint16_t>(SigmaOp::SetCamDataGroupFocus),
+                    {}, &payload, false);
+  LOG_INFO("set_cam_data_group_focus sent, resp=0x%04X", r.response_code);
+  return r;
+}
+
+CamDataGroupFocus SigmaCamera::get_cam_data_group_focus() {
+  auto r = transact(static_cast<std::uint16_t>(SigmaOp::GetCamDataGroupFocus),
+                    {}, nullptr, true);
+  LOG_INFO("get_cam_data_group_focus sent, resp=0x%04X", r.response_code);
+  CamDataGroupFocus gf;
+  gf.decode(r.data);
+  LOG_INFO("CamDataGroupFocus: %s", gf.to_string().c_str());
+  return gf;
+
+}
+
 // --- CamCaptStatus ---
-CamCaptStatus SigmaCamera::get_cam_capt_status() {
+CamCaptStatus SigmaCamera::get_cam_capt_status()
+{
   auto r = transact(static_cast<std::uint16_t>(SigmaOp::GetCamCaptStatus), {},
                     nullptr, true);
   CamCaptStatus s;
@@ -77,21 +97,24 @@ Returns:
 }
 
 CamCaptStatus SigmaCamera::wait_completion(std::uint8_t image_id, int polls,
-                                           int sleep_ms) {
+                                           int sleep_ms)
+{
 
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   CamCaptStatus st;
   int err = 0;
-  for (int i = 0; i < polls; ++i) {
+  for (int i = 0; i < polls; ++i)
+  {
     st = get_cam_capt_status(image_id);
     const std::uint16_t code = static_cast<std::uint16_t>(st.Status);
     LOG_DEBUG("CaptStatus img=%u head=%u tail=%u code=0x%04X", st.ImageId,
               st.ImageDBHead, st.ImageDBTail, code);
 
-    switch (static_cast<CaptStatus>(code)) {
+    switch (static_cast<CaptStatus>(code))
+    {
     case CaptStatus::ImageGenCompleted:
     case CaptStatus::ImageDataStorageCompleted:
-    // case CaptStatus::Cleared:
+      // case CaptStatus::Cleared:
       return st;
 
     case CaptStatus::ShootInProgress:
@@ -121,8 +144,8 @@ Args:
     data (SnapCommand): a snap command object.*/
 {
   auto payload = cmd.encode();
-  auto r = transact(static_cast<std::uint16_t>(SigmaOp::SnapCommand), {}, &payload,
-                 false);
+  auto r = transact(static_cast<std::uint16_t>(SigmaOp::SnapCommand), {},
+                    &payload, false);
   LOG_DEBUG("Snap Response: 0x%04X", r.response_code);
   if (r.params.size() > 0)
     log_hex_preview(LogLevel::Debug, r.params.data(), r.params.size());
@@ -169,7 +192,8 @@ Returns:
   return info;
 }
 
-PictFileInfo2 SigmaCamera::get_pict_file_info2(std::uint32_t object_handle) {
+PictFileInfo2 SigmaCamera::get_pict_file_info2(std::uint32_t object_handle)
+{
   auto r = transact(static_cast<std::uint16_t>(SigmaOp::GetPictFileInfo2),
                     {object_handle}, nullptr, true);
   PictFileInfo2 info;
@@ -226,7 +250,8 @@ Examples:
 //  --- Vendor-chunked object download ---
 std::vector<std::uint8_t>
 SigmaCamera::get_object_vendor(std::uint32_t object_handle,
-                               std::uint32_t chunk) {
+                               std::uint32_t chunk)
+{
   const auto info = get_pict_file_info2(object_handle);
   std::vector<std::uint8_t> out;
   out.reserve(info.FileSize);
@@ -234,7 +259,8 @@ SigmaCamera::get_object_vendor(std::uint32_t object_handle,
   std::uint32_t addr = info.FileAddress;
   std::uint32_t left = info.FileSize;
   std::uint32_t start = 0;
-  while (left) {
+  while (left)
+  {
     const std::uint32_t req = std::min(chunk, left);
     BigPartialPictFile part = get_big_partial_pict_file(addr, start, req);
     if (part.AcquiredSize == 0 || part.PartialData.empty())
@@ -251,12 +277,16 @@ SigmaCamera::get_object_vendor(std::uint32_t object_handle,
 
 // TODO remove ?
 std::vector<uint8_t> SigmaCamera::get_latest_image(DestToSave mode,
-                                                   int timeout) {
-  if (mode == DestToSave::InComputer) {
+                                                   int timeout)
+{
+  if (mode == DestToSave::InComputer)
+  {
     if (auto h = SigmaCamera::wait_object_added(timeout, 200))
       return SigmaCamera::get_object(*h);
     return {};
-  } else {
+  }
+  else
+  {
     return SigmaCamera::get_object_vendor(128 * 1024);
   }
 }
@@ -285,7 +315,7 @@ Returns:
 }
 
 template <class GroupT>
-void SigmaCamera::set_group(const GroupT &g)
+CameraPTP::Response SigmaCamera::set_group(const GroupT &g)
 /*This instruction changes DataGroup5 status information of the camera.
 
 Args:
@@ -295,8 +325,8 @@ Args:
   LOG_DEBUG("Bytes encoding for class %s:", typeid(GroupT).name());
   log_hex_preview(LogLevel::Debug, bytes.data(), bytes.size());
 
-  (void)transact(static_cast<std::uint16_t>(SigmaGroupMap<GroupT>::Set), {},
-                 &bytes, false);
+  return transact(static_cast<std::uint16_t>(SigmaGroupMap<GroupT>::Set), {},
+                  &bytes, false);
 }
 
 // explicit instantiation for 1..5
@@ -306,8 +336,8 @@ template CamDataGroup3 SigmaCamera::get_group<CamDataGroup3>();
 template CamDataGroup4 SigmaCamera::get_group<CamDataGroup4>();
 template CamDataGroup5 SigmaCamera::get_group<CamDataGroup5>();
 
-template void SigmaCamera::set_group<CamDataGroup1>(const CamDataGroup1 &);
-template void SigmaCamera::set_group<CamDataGroup2>(const CamDataGroup2 &);
-template void SigmaCamera::set_group<CamDataGroup3>(const CamDataGroup3 &);
-template void SigmaCamera::set_group<CamDataGroup4>(const CamDataGroup4 &);
-template void SigmaCamera::set_group<CamDataGroup5>(const CamDataGroup5 &);
+template CameraPTP::Response SigmaCamera::set_group<CamDataGroup1>(const CamDataGroup1 &);
+template CameraPTP::Response SigmaCamera::set_group<CamDataGroup2>(const CamDataGroup2 &);
+template CameraPTP::Response SigmaCamera::set_group<CamDataGroup3>(const CamDataGroup3 &);
+template CameraPTP::Response SigmaCamera::set_group<CamDataGroup4>(const CamDataGroup4 &);
+template CameraPTP::Response SigmaCamera::set_group<CamDataGroup5>(const CamDataGroup5 &);
