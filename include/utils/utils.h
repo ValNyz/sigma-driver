@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 
 // ---- helpers ----
 // Put 8 bits, 1 byte
@@ -26,6 +28,12 @@ static inline void put_16be(std::vector<std::uint8_t> &b, std::uint16_t v) {
 static inline void put_16le(std::vector<std::uint8_t> &b, std::uint16_t v) {
   b.push_back(v);
   b.push_back(v >> 8);
+}
+
+// Put 16 bits, 2 bytes (little endian)
+static inline void put_16le_at(std::vector<std::uint8_t> &b, std::uint16_t v, size_t pos) {
+  b[pos] = v;
+  b[pos+1] = v >> 8;
 }
 
 // Get 16 bits, 2 bytes (big endian)
@@ -57,18 +65,18 @@ static inline void put_32le(std::vector<std::uint8_t> &b, std::uint32_t v) {
   b.push_back(v >> 24);
 }
 
+// Put 32 bits, 8 bytes (little endian)
+static inline void put_32le_at(std::vector<std::uint8_t> &b, std::uint32_t v, size_t pos) {
+  b[pos] = v;
+  b[pos+1] = v >> 8;
+  b[pos+2] = v >> 16;
+  b[pos+3] = v >> 24;
+}
+
 // Read 32 bits, 4 bytes (little endian)
 static inline std::uint32_t read_32le(const std::uint8_t *p) {
   return std::uint32_t(p[0]) | (std::uint32_t(p[1]) << 8) |
          (std::uint32_t(p[2]) << 16) | (std::uint32_t(p[3]) << 24);
-}
-
-// Appends a 32-bit integer to a byte vector in little-endian order.
-static inline void append_u32le(std::vector<uint8_t> &b, uint32_t v) {
-  b.push_back(uint8_t(v));
-  b.push_back(uint8_t(v >> 8));
-  b.push_back(uint8_t(v >> 16));
-  b.push_back(uint8_t(v >> 24));
 }
 
 // Decode 16-bit 12.4 fixed-point
@@ -128,6 +136,16 @@ inline static std::vector<uint8_t> hex2bin(std::string_view s) {
   if (hi >= 0)
     throw std::runtime_error("odd hex length");
   return out;
+}
+
+
+static inline std::string bin2hex(const std::vector<uint8_t>& v) {
+  std::ostringstream os;
+  for (size_t i = 0; i < v.size(); ++i) {
+    if (i) os << ' ';
+    os << std::hex << std::setw(2) << std::setfill('0') << (int)v[i];
+  }
+  return os.str();
 }
 
 inline static void mask_tid(std::vector<uint8_t> &v, uint32_t value = 0) {

@@ -32,7 +32,7 @@ void CameraPTP::open_session(std::uint32_t sid)
   h->container_type = PTP_CONTAINER_COMMAND;
   h->operation_or_response = PTP_OP_OpenSession;
   h->transaction_id = next_tid_++;
-  append_u32le(cmd, sid);
+  put_32le(cmd, sid);
   transport_.write_exact(cmd.data(), (int)cmd.size());
   (void)read_full_container_();
 }
@@ -61,7 +61,7 @@ CameraPTP::Response CameraPTP::transact(
   ch->operation_or_response = opcode;
   ch->transaction_id = next_tid_++;
   for (auto p : params)
-    append_u32le(cmd, p);
+    put_32le(cmd, p);
   transport_.write_exact(cmd.data(), (int)cmd.size());
 
   if (data_out)
