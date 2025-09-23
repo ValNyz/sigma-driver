@@ -62,7 +62,7 @@ Install the `.rpm`
 sudo dnf install ./sigma-camera-*.rpm
 ```
 
-## Test
+## Test
 
 After the compilation or the installation, connect your SIGMA fp to your computer with "Camera Control" mode and
 type the following command. If the camera is detected, a message is printed.
