@@ -12,25 +12,64 @@ from computers such as
 - getting and setting parameters (shutter speed, aperture, white balance, color mode, etc.),
 - taking pictures,
 - live view,
+- bulb for 300s only -> Using NonAFCapt to start the capture but i didn't find any way to stop it with a manual lense.
 
 and so on. This C library provides a part of the operation.
 
-## Getting started
+## Build
+
+To build, you need the following packages :
+- build-essential
+- cmake
+- pkg-config
+- libusb-1.0-0-dev
 
 The source code can be compiled by :
 
 ```sh
-mkdir build
-cd build
-cmake ..
-make
+mkdir build && cd build
+cmake -B build -DBUILD_SHARED_LIBS=ON .
+cmake --build build
+sudo cmake --install build
 ```
 
-After the compilation, connect your SIGMA fp to your computer with "Camera Control" mode and
+## Install
+
+### Ubuntu
+
+Install libusb-1.0 dependency :
+```sh
+sudo apt update
+sudo apt install libusb-1.0-0
+```
+
+Download the deb package associated to your Ubuntu distribution.
+Install the `.deb`
+```sh
+sudo apt install ./sigma-camera_*.deb
+```
+
+### Fedora
+
+Install libusb-1.0 dependency :
+```sh
+sudo dnf install libusb1
+```
+
+Download the rpm package associated to your Fedora distribution.
+Install the `.rpm`
+```sh
+sudo dnf install ./sigma-camera-*.rpm
+```
+
+## Test
+
+After the compilation or the installation, connect your SIGMA fp to your computer with "Camera Control" mode and
 type the following command. If the camera is detected, a message is printed.
 
 ```console
-./sigma_camera_test
+sigma_camera_test
+sigma_bulb_test
 ```
 
 ## Related work
@@ -43,4 +82,4 @@ SIGMA Corp distributes the [SIGMA Camera Control SDK](https://www.sigma-global.c
 
 ## Contribution
 
-Uo're welcome to fork and create a PR.
+You are welcome to fork and create a PR.
