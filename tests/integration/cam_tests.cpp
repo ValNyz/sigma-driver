@@ -257,6 +257,56 @@ TEST_CASE("SetCamDataGroup5 cmd/data out frame")
   REQUIRE(data_m == golden_data);
 }
 
+TEST_CASE("SetCamDataGroupFocus cmd/data out frame")
+{
+  FakeTransport tp;
+  SigmaCamera cam(tp);
+
+  CamDataGroupFocus g{};
+  g.focusMode = FocusMode::MF;
+  // g.faceEyeAF = FaceEyeAF::Off;
+  g.preConstAF = PreConstAF::Off;
+
+  auto payload = g.encode();
+
+  constexpr uint16_t OP = static_cast<uint16_t>(SigmaOp::SetCamDataGroupFocus);
+
+  auto r = cam.transact(OP, {}, &payload, false);
+  REQUIRE(r.response_code == PTP_RESP_OK);
+
+  REQUIRE(tp.writes.size() == 2);
+  const auto &cmd = tp.writes[0];
+  const auto &data = tp.writes[1];
+
+  REQUIRE(cmd.size() == 12);
+  REQUIRE(read_16le(&cmd[4]) == PTP_CONTAINER_COMMAND);
+  REQUIRE(read_16le(&cmd[6]) == OP);
+  const uint32_t txn = read_32le(&cmd[8]);
+  REQUIRE(read_32le(&cmd[0]) == cmd.size());
+
+  REQUIRE(data.size() >= 12);
+  REQUIRE(read_16le(&data[4]) == PTP_CONTAINER_DATA);
+  REQUIRE(read_16le(&data[6]) == OP);
+  REQUIRE(read_32le(&data[8]) == txn);
+  REQUIRE(read_32le(&data[0]) == data.size());
+  REQUIRE(data.size() == 12 + payload.size());
+  REQUIRE(std::equal(payload.begin(), payload.end(), data.begin() + 12));
+
+  auto cmd_m = cmd, data_m = data;
+  mask_tid(cmd_m);
+  mask_tid(data_m);
+
+  LOG_INFO("SetCamDataGroupFocus cmd/data out frame");
+  log_hex_preview(LogLevel::Info, cmd_m.data(), cmd_m.size());
+  log_hex_preview(LogLevel::Info, data_m.data(), data_m.size());
+
+  const auto golden_cmd  = hex2bin("0C 00 00 00 01 00 32 90 00 00 00 00");
+  const auto golden_data = hex2bin("2C 00 00 00 02 00 32 90 00 00 00 00 20 00 00 00 02 00 00 00 01 00 01 00 01 00 00 00 01 00 00 00 51 00 01 00 01 00 00 00 00 00 00 00");
+
+  REQUIRE(cmd_m == golden_cmd);
+  REQUIRE(data_m == golden_data);
+}
+
 
 TEST_CASE("GetCamDataGroup1 cmd/data out frame")
 {
@@ -374,7 +424,7 @@ TEST_CASE("GetCamDataGroup5 cmd/data out frame")
   auto cmd_m = cmd;
   mask_tid(cmd_m);
 
-  LOG_INFO("GetCamDataGroup1 cmd/data out frame");
+  LOG_INFO("GetCamDataGroup5 cmd/data out frame");
   log_hex_preview(LogLevel::Info, cmd_m.data(), cmd_m.size());
 
   // golden byte-for-byte comparisons
@@ -382,3 +432,29 @@ TEST_CASE("GetCamDataGroup5 cmd/data out frame")
 
   REQUIRE(cmd_m  == golden_cmd);
 }
+
+TEST_CASE("GetCamDataGroupFocus cmd/data out frame")
+{
+  FakeTransport tp;
+  SigmaCamera cam(tp);
+  constexpr uint16_t OP = static_cast<uint16_t>(SigmaOp::GetCamDataGroupFocus);
+  auto r = cam.transact(OP, {}, nullptr, true);
+
+  REQUIRE(r.response_code == PTP_RESP_OK);
+
+  REQUIRE(tp.writes.size() == 1);
+  const auto &cmd = tp.writes[0];
+
+
+  auto cmd_m = cmd;
+  mask_tid(cmd_m);
+
+  LOG_INFO("GetCamDataGroupFocus cmd/data out frame");
+  log_hex_preview(LogLevel::Info, cmd_m.data(), cmd_m.size());
+
+  // golden byte-for-byte comparisons
+  const auto golden_cmd = hex2bin("0C 00 00 00 01 00 31 90 00 00 00 00");
+
+  REQUIRE(cmd_m  == golden_cmd);
+}
+

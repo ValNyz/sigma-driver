@@ -67,6 +67,7 @@ const ApexConverter ExpComp3Converter({
 });
 
 const ApexConverter ShutterSpeed2Converter({
+    {8, 0}, // BULB
     {17, 30},
     {20, 20},
     {24, 15},
@@ -109,6 +110,7 @@ const ApexConverter ShutterSpeed2Converter({
 });
 
 const ApexConverter ShutterSpeed3Converter({
+    {8, 0}, // BULB
     {16, 30},
     {19, 25},
     {21, 20},
